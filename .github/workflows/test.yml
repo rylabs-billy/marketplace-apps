@@ -38,7 +38,7 @@ jobs:
 
       - name: Set test UDFs
         shell: bash
-        run:
+        run: |-
           ls -la
           echo "./deployment_scripts/linode-marketplace-$APP/test-vars.sh"
         env:
