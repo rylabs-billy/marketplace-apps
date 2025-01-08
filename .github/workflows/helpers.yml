@@ -34,6 +34,6 @@ jobs:
           sudo apt install python3-certbot
           certbot -n --standalone --agree-tos --redirect certonly \
             -d $DOMAIN -m $SOA_EMAIL --server https://localhost:14000/dir
-
-      
-          
+        env:
+          DOMAIN: test.example.com
+          SOA_EMAIL: test@example.com
