@@ -32,7 +32,7 @@ jobs:
         shell: bash
         run: |-
           sudo apt install python3-certbot
-          sudo certbot -n --standalone --agree-tos --redirect certonly \
+          sudo REQUESTS_CA_BUNDLE=$REQUESTS_CA_BUNDLE certbot -n --standalone --agree-tos --redirect certonly \
             -d $DOMAIN -m $SOA_EMAIL --server https://localhost:14000/dir
         env:
           DOMAIN: test.example.com
