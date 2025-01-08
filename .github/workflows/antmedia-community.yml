@@ -28,9 +28,9 @@ jobs:
           - ubuntu-22.04
           - ubuntu-24.04
     uses: ./.github/workflows/test.yml
-      with:
-        app-name: ${{ matrix.version }}
-        platform: ${{ matrix.os }}
+    with:
+      app-name: ${{ matrix.version }}
+      platform: ${{ matrix.os }}
     # steps:
     #   - name: Checkout
     #     uses: actions/checkout@v4
