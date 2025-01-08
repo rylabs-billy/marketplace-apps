@@ -34,7 +34,6 @@ jobs:
 
           echo "[info] git branch: $BRANCH"
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
-          echo "test"
 
       - name: Set test UDFs
         shell: bash
