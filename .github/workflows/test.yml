@@ -38,16 +38,14 @@ jobs:
 
       - name: Set test UDFs
         shell: bash
-        run: |-
-          ls -la
-          echo "./deployment_scripts/linode-marketplace-$APP/test-vars.sh"
+        run: ./deployment_scripts/linode-marketplace-$APP/test-vars.sh
         env:
           APP: ${{ inputs.app-name }}
           TOKEN_PASSWORD: ${{ secrets.LINODE_TOKEN }}
 
       - name: Deploy playbook
         shell: bash
-        run: ./deployment_scripts/linode-marketplace-$APP/$APP-deploy.sh
+        run: sudo -E ./deployment_scripts/linode-marketplace-$APP/$APP-deploy.sh
         env:
           APP: ${{ inputs.app-name }}
           TOKEN_PASSWORD: ${{ secrets.LINODE_TOKEN }}
