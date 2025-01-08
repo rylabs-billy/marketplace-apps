@@ -27,16 +27,19 @@ jobs:
         os:
           - ubuntu-22.04
           - ubuntu-24.04
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
+    uses: ./.github/workflows/test.yml
+      with:
+        app-name: ${{ matrix.version }}
+        platform: ${{ matrix.os }}
+    # steps:
+    #   - name: Checkout
+    #     uses: actions/checkout@v4
+    #     with:
+    #       fetch-depth: 1
 
-      - uses: ./.github/workflows/test.yml
-        with:
-          app-name: ${{ matrix.version }}
-          platform: ${{ matrix.os }}
+      # - uses: ./.github/workflows/test.yml
+      #   with:
+      #     app-name: ${{ matrix.version }}
+      #     platform: ${{ matrix.os }}
 
      
