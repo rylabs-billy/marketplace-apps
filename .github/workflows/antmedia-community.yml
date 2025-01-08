@@ -24,9 +24,14 @@ jobs:
         version:
           - antmedia
           - antmedia-community
+        os:
+          - ubuntu-22.04
+          - ubuntu-24.04
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: ./.github/workflows/test.yml
         with:
           app-name: ${{ matrix.version }}
+          platform: ${{ matrix.os }}
 
      

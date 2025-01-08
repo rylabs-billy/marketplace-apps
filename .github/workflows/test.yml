@@ -6,14 +6,14 @@ on:
       app-name:
         required: true
         type: string
+      platform:
+        required: false
+        default: ubuntu-latest
+        type: string
 
 jobs:
   test:
-    strategy:
-      matrix:
-        os:
-          - ubuntu-22.04
-          - ubuntu-24.04
+    runs-on: ${{ inputs.platform }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
