@@ -6,20 +6,20 @@ on:
       app-name:
         required: true
         type: string
+      platform:
+        required: false
+        default: ubuntu-latest
+        type: string
 
 jobs:
   test:
-    strategy:
-      matrix:
-        os:
-          - ubuntu-22.04
-          - ubuntu-24.04
+    runs-on: ${{ inputs.platform }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
-
+          
       - name: Set git repo and branch environment variables
         shell: bash
         run: |-
