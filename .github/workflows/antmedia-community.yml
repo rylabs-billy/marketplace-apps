@@ -1,0 +1,32 @@
+name: antmedia-community
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - antmedia-ci
+    paths:
+      - 'apps/linode-marketplace-antmedia-community/**'
+      - 'deployment_scripts/linode-marketplace-antmedia-community/**'
+      - '!apps/linode-marketplace-antmedia-community/README.md'
+  pull_request:
+      paths:
+        - 'apps/linode-marketplace-antmedia-community/**'
+        - 'deployment_scripts/linode-marketplace-antmedia-community/**'
+        - '!apps/linode-marketplace-antmedia-community/README.md'
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        version:
+          - antmedia
+          - antmedia-community
+    steps:
+        uses: ./.github/workflows/test.yml
+        with:
+          app-name: ${{ matrix.version }}
+
+     
