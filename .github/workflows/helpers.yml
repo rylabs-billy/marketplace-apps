@@ -14,7 +14,7 @@ on:
 
 jobs:
   certbot:
-    runs-on: ${{ inputs.platform }}
+    runs-on: ubuntu-latest
     steps:
       - name: Setup Pebble for mock certs
         shell: bash
