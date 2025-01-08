@@ -37,3 +37,4 @@ jobs:
         env:
           DOMAIN: test.example.com
           SOA_EMAIL: test@example.com
+          REQUESTS_CA_BUNDLE: ${{ env.REQUESTS_CA_BUNDLE }}
