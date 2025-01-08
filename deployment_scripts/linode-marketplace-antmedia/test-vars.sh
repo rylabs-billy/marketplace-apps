@@ -11,8 +11,8 @@ declare -A UDF_VARS
 UDF_VARS["USER_NAME"]="testuser"
 UDF_VARS["DISABLE_ROOT"]="Yes"
 UDF_VARS["SUBDOMAIN"]="test"
-UDF_VARS["DOMAIN"]="linode.com" 
-UDF_VARS["SOA_EMAIL_ADDRESS"]="noreply@linode.com" 
+UDF_VARS["DOMAIN"]="example.com" 
+UDF_VARS["SOA_EMAIL_ADDRESS"]="test@lexample.com" 
 
 
 github_env() {

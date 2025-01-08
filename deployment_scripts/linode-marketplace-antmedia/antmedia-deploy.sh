@@ -15,7 +15,7 @@ trap "cleanup $? $LINENO" EXIT
 #<UDF name="soa_email_address" label="Email address (for the Ant Media Server Login & SSL Generation)">
 
 # git repo
-export GIT_REPO="https://github.com/akamai-compute-marketplace/marketplace-apps.git"
+[ -z "${GIT_REPO}" ] && export GIT_REPO="https://github.com/akamai-compute-marketplace/marketplace-apps.git"
 export WORK_DIR="/tmp/marketplace-apps" 
 export MARKETPLACE_APP="apps/linode-marketplace-antmedia"
 
@@ -23,8 +23,16 @@ export MARKETPLACE_APP="apps/linode-marketplace-antmedia"
 exec > >(tee /dev/ttyS0 /var/log/stackscript.log) 2>&1
 
 function cleanup {
-  if [ -d "${WORK_DIR}" ]; then
-    rm -rf ${WORK_DIR}
+  if [ "$?" != "0" ]; then
+    echo "PLAYBOOK FAILED. See /var/log/stackscript.log for details."
+    if [ -n "$GITHUB_ENV" ]; then
+      echo "PLAYBOOK_FAILED=1" | tee -a $GITHUB_ENV
+    fi
+
+    if [ -d "${WORK_DIR}" ]; then
+      rm -rf ${WORK_DIR}
+    fi
+    exit 1
   fi
 }
 
@@ -92,9 +100,6 @@ function run {
   
 }
 
-function installation_complete {
-  echo "Installation Complete"
-}
 # main
-run && installation_complete
+run && echo "Installation Complete"
 cleanup

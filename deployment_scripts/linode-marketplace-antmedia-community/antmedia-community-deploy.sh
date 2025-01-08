@@ -24,7 +24,6 @@ exec > >(tee /dev/ttyS0 /var/log/stackscript.log) 2>&1
 
 function cleanup {
   if [ "$?" != "0" ]; then
-    echo "Error: $BASH_COMMAND failed with exit code $?"
     echo "PLAYBOOK FAILED. See /var/log/stackscript.log for details."
     if [ -n "$GITHUB_ENV" ]; then
       echo "PLAYBOOK_FAILED=1" | tee -a $GITHUB_ENV

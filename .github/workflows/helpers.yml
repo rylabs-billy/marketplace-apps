@@ -1,0 +1,39 @@
+name: helpers
+
+on:
+  push:
+  pull_request:
+  # workflow_call:
+  #   inputs:
+  #     certbot:
+  #       required: false
+  #       type: bool
+  #     fail2ban:
+  #       required: false
+  #       type: bool
+
+jobs:
+  certbot:
+    runs-on: ${{ inputs.platform }}
+    steps:
+      - name: Setup Pebble for mock certs
+        shell: bash
+        run: |-
+          currentDir=$(pwd)
+          cd /tmp
+          git clone https://github.com/letsencrypt/pebble/
+          cd pebble
+          docker compose up -d
+          pebble_ca=$(realpath test/certs/pebble.minica.pem)
+          echo "REQUESTS_CA_BUNDLE=$pebble_ca" >> $GITHUB_ENV
+          cd $currentDir
+
+      - name: test certbot
+        shell: bash
+        run: |-
+          sudo apt install python3-certbot
+          certbot -n --standalone --agree-tos --redirect certonly \
+            -d $DOMAIN -m $SOA_EMAIL --server https://localhost:14000/dir
+
+      
+          
