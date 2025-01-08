@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
-trap "cleanup $? $LINENO" EXIT
+DEBUG="NO"
+if [ "${DEBUG}" == "NO" ]; then
+  trap "cleanup $? $LINENO" EXIT
+fi
 
 ## Linode/SSH security settings
 #<UDF name="user_name" label="The limited sudo user to be created for the Linode: *No Capital Letters or Special Characters*">
@@ -11,30 +14,23 @@ trap "cleanup $? $LINENO" EXIT
 #<UDF name="subdomain" label="Subdomain" example="The subdomain for the DNS record: www (Requires Domain)" default="">
 #<UDF name="domain" label="Domain" example="The domain for the DNS record: example.com (Requires API token)" default="">
 
-## antmedia setup
-#<UDF name="soa_email_address" label="Email address (for the Ant Media Server Login & SSL Generation)">
+## code-server setup
+#<UDF name="soa_email_address" label="Email address (for the Let's Encrypt SSL certificate)" example="user@domain.tld">
+#<UDF name="code_server_version" label="Which version of Code-Server to install" oneOf="4.96.1">
 
 # git repo
-[ -z "${GIT_REPO}" ] && export GIT_REPO="https://github.com/akamai-compute-marketplace/marketplace-apps.git"
+export GIT_REPO="https://github.com/akamai-compute-marketplace/marketplace-apps.git"
 export WORK_DIR="/tmp/marketplace-apps" 
-export MARKETPLACE_APP="apps/linode-marketplace-antmedia-community"
+export MARKETPLACE_APP="apps/linode-marketplace-code-server"
 
 # enable logging
 exec > >(tee /dev/ttyS0 /var/log/stackscript.log) 2>&1
 
 function cleanup {
-  if [ "$?" != "0" ]; then
-    echo "Error: $BASH_COMMAND failed with exit code $?"
-    echo "PLAYBOOK FAILED. See /var/log/stackscript.log for details."
-    if [ -n "$GITHUB_ENV" ]; then
-      echo "PLAYBOOK_FAILED=1" | tee -a $GITHUB_ENV
-    fi
-
-    if [ -d "${WORK_DIR}" ]; then
-      rm -rf ${WORK_DIR}
-    fi
-    exit 1
+  if [ -d "${WORK_DIR}" ]; then
+    rm -rf ${WORK_DIR}
   fi
+
 }
 
 function udf {
@@ -44,17 +40,14 @@ function udf {
 
   # sudo username
   username: ${USER_NAME}
-  webserver_stack: standalone
+  webserver_stack: lemp
+  # code-server version
+  code_server_version: ${CODE_SERVER_VERSION}
 EOF
 
   if [ "$DISABLE_ROOT" = "Yes" ]; then
     echo "disable_root: yes" >> ${group_vars};
   else echo "Leaving root login enabled";
-  fi
-
-  # antmedia vars
-  if [[ -n ${SOA_EMAIL_ADDRESS} ]]; then
-    echo "soa_email_address: ${SOA_EMAIL_ADDRESS}" >> ${group_vars};
   fi
 
   if [[ -n ${DOMAIN} ]]; then
@@ -72,7 +65,12 @@ EOF
     echo "token_password: ${TOKEN_PASSWORD}" >> ${group_vars};
   else echo "No API token entered";
   fi
-  
+
+  if [[ -n ${SOA_EMAIL_ADDRESS} ]]; then
+    echo "soa_email_address: ${SOA_EMAIL_ADDRESS}" >> ${group_vars};
+  fi
+
+
 }
 
 function run {
@@ -81,18 +79,14 @@ function run {
   apt-get install -y git python3 python3-pip
 
   # clone repo and set up ansible environment
-  # testing: set $BRANCH environment variable
-  echo "[info] cloning git repo"
-  if [ -z "${BRANCH}" ]; then 
-    git -C /tmp clone ${GIT_REPO} ${WORK_DIR}
-  else
-    git -C /tmp clone -b ${BRANCH} ${GIT_REPO} ${WORK_DIR}
-  fi
+  git -C /tmp clone ${GIT_REPO}
+  # for a single testing branch
+  # git -C /tmp clone -b ${BRANCH} ${GIT_REPO}
 
   # venv
   cd ${WORK_DIR}/${MARKETPLACE_APP}
-  pip3 install virtualenv
-  python3 -m virtualenv env
+  apt install python3-venv -y
+  python3 -m venv env
   source env/bin/activate
   pip install pip --upgrade
   pip install -r requirements.txt
@@ -102,8 +96,12 @@ function run {
   udf
   # run playbooks
   ansible-playbook -v provision.yml && ansible-playbook -v site.yml
+
 }
 
+function installation_complete {
+  echo "Installation Complete"
+}
 # main
-run && echo "Installation Complete"
+run && installation_complete
 cleanup
