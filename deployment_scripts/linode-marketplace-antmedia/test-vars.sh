@@ -10,7 +10,7 @@
 echo YYYYYYY
 pwd
 
-source helpers/utils.sh
+source ./helpers/utils.sh
 
 declare -A UDF_VARS
 UDF_VARS["USER_NAME"]="testuser"
