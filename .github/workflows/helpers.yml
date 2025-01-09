@@ -29,8 +29,8 @@ jobs:
           cd pebble
           
           go install ./cmd/pebble
-          sed -ie 's/"httpPort"\: .*/"httpPort"\: 80/g' test/config/pebble-config.json
-          sed -ie 's/"tlsPort"\: .*/"tlsPort"\: 443/g' test/config/pebble-config.json
+          sed -ie 's/"httpPort"\: .*/"httpPort"\: 80,/g' test/config/pebble-config.json
+          sed -ie 's/"tlsPort"\: .*/"tlsPort"\: 443,/g' test/config/pebble-config.json
           echo "this"
           cat test/config/pebble-config.json
           pebble_ca=$(realpath test/certs/pebble.minica.pem)
