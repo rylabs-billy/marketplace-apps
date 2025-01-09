@@ -43,7 +43,7 @@ run_pebble () {
 test_cerbot () {
   echo "${testIP} ${DOMAIN} ${SUBDOMAIN}.${DOMAIN}" | tee -a /etc/hosts
   apt install python3-certbot -y
-  REQUESTS_CA_BUNDLE="${CA_BUNDLE}" certbot -n --standalone --agree-tos \
+  REQUESTS_CA_BUNDLE="${pebble_ca_path}" certbot -n --standalone --agree-tos \
     --redirect certonly -d "${DOMAIN}" -d "${SUBDOMAIN}.${DOMAIN}" -m "${SOA_EMAIL_ADDRESS}" \
     --server "${serverAddress}" --debug-challenges --verbose --dry-run
 }
