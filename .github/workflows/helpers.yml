@@ -31,12 +31,14 @@ jobs:
           go install ./cmd/pebble
           sed -ie 's/"httpPort"\: .*/"httpPort"\: 80,/g' test/config/pebble-config.json
           sed -ie 's/"tlsPort"\: .*/"tlsPort"\: 443,/g' test/config/pebble-config.json
-          echo "this"
+          
           cat test/config/pebble-config.json
           pebble_ca=$(realpath test/certs/pebble.minica.pem)
           echo "pebble_ca_path=$pebble_ca" >> $GITHUB_ENV
+          echo $pebble_ca
           echo "~/go/bin" >> $GITHUB_PATH
-          pebble -config test/config/pebble-config.json > /dev/null
+          echo this
+          pebble -config test/config/pebble-config.json >> /dev/null
           echo $GITHUB_WORKSPACE
 
       - name: Test certbot
