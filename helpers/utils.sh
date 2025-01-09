@@ -1,6 +1,6 @@
 #!/bin/bash
 # helpers/util.sh
-
+set -x
 # reusable utility functions
 github:path () {
   local path="$1"

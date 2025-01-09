@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # setup test environment for certbot helper
-
+set -x
 readonly workflowDir=$(pwd)
 readonly helperDir="/tmp/certbot"
 readonly version=1.23.4
