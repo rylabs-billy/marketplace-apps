@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - develop
-      # - antmedia-ci
+      - antmedia-ci
     # paths:
     #   - 'apps/linode-marketplace-antmedia-community/**'
     #   - 'deployment_scripts/linode-marketplace-antmedia-community/**'
@@ -18,6 +18,13 @@ on:
   workflow_dispatch:
 
 jobs:
+  certbot:
+    uses: ./.github/workflows/helpers/certbot.yml
+    with:
+      domain:
+      subdomain:
+      soa-email:
+
   build:
     strategy:
       matrix:
@@ -27,6 +34,10 @@ jobs:
         os:
           - ubuntu-22.04
           - ubuntu-24.04
+    uses: ./.github/workflows/helpers.yml
+    with:
+      certbot: true
+
     uses: ./.github/workflows/test.yml
     with:
       app-name: ${{ matrix.version }}
