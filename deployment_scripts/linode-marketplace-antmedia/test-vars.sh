@@ -9,6 +9,7 @@
 
 echo YYYYYYY
 pwd
+ls -la
 
 source ./helpers/utils.sh
 
