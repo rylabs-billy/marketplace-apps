@@ -11,7 +11,7 @@ readonly goArchive="go$version.$platform.tar.gz"
 readonly testIP=127.0.0.201
 readonly serverAddress="https://localhost:14000/dir"
 
-source ./utils.sh
+source ./helpers/utils.sh
 
 install_go () {
   curl -sLO "https://go.dev/dl/$goArchive"
