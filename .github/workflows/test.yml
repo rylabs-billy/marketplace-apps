@@ -50,7 +50,7 @@ jobs:
 
       - name: Mock certbot
         if: ${{ inputs.certbot == true }}
-        run: sudo -E .apps/linode_helpers/scripts/certbot-test.sh
+        run: sudo -E ./helpers/certbot-test.sh
 
       - name: Deploy playbook
         shell: bash
