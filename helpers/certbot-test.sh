@@ -14,16 +14,16 @@ readonly serverAddress="https://localhost:14000/dir"
 source ./helpers/utils.sh
 
 install_go () {
-  curl -sLO "https://go.dev/dl/$goArchive"
-  echo "$checksum $goArchive" | sha256sum -c
-  rm -rf /usr/local/go && tar -C /usr/local -xzf $goArchive
+  curl -sLO "https://go.dev/dl/${goArchive}"
+  echo "${checksum} ${goArchive}" | sha256sum -c
+  rm -rf /usr/local/go && tar -C /usr/local -xzf ${goArchive}
   export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
-  echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" | tee -a $HOME/.bashrc
-  github:path $PATH
+  echo "export PATH=${PATH}:/usr/local/go/bin:${HOME}/go/bin" | tee -a "${HOME}/.bashrc"
+  github:path "${PATH}"
 }
 
 run_pebble () {
-    cd $helperDir
+    mkdir -p "${helperDir}" && cd "${helperDir}"
     git clone https://github.com/letsencrypt/pebble/
     cd pebble
     go install ./cmd/pebble
@@ -33,28 +33,28 @@ run_pebble () {
     cat test/config/pebble-config.json
 
     pebble_ca=$(realpath test/certs/pebble.minica.pem)
-    export pebble_ca_path="$pebble_ca"
-    github:env "pebble_ca_path" $pebble_ca
+    export pebble_ca_path="${pebble_ca}"
+    github:env "pebble_ca_path" "${pebble_ca}"
 
     # run pebble as a background process
     pebble -config test/config/pebble-config.json > /dev/null 2>&1 &
 }
 
 test_cerbot () {
-  echo "$testIP $DOMAIN $SUBDOMAIN.$DOMAIN" | tee -a /etc/hosts
+  echo "${testIP} ${DOMAIN} ${SUBDOMAIN}.${DOMAIN}" | tee -a /etc/hosts
   apt install python3-certbot -y
-  REQUESTS_CA_BUNDLE=$CA_BUNDLE certbot -n --standalone --agree-tos \
-    --redirect certonly -d $DOMAIN -d $SUBDOMAIN.$DOMAIN -m $SOA_EMAIL \
-    --server $serverAddress --debug-challenges --verbose --dry-run
+  REQUESTS_CA_BUNDLE="${CA_BUNDLE}" certbot -n --standalone --agree-tos \
+    --redirect certonly -d "${DOMAIN}" -d "${SUBDOMAIN}.${DOMAIN}" -m "${SOA_EMAIL}" \
+    --server "${serverAddress}" --debug-challenges --verbose --dry-run
 }
 
 certbot_alias () {
-  echo >> $HOME/.bashrc
-  echo "# certbot" >> $HOME/.bashrc
-  cat <<EOF > $HOME/.bashrc
+  echo >> "${HOME}/.bashrc"
+  echo "# certbot" >> "${HOME}/.bashrc"
+  cat <<EOF > "${HOME}/.bashrc"
 certbot() {
   args="$@"
-  REQUESTS_CA_BUNDLE=$CA_BUNDLE $(which certbot) $args \
+  REQUESTS_CA_BUNDLE="${CA_BUNDLE}" $(which certbot) "${args}" \
     --server https://localhost:14000/dir
 }
 EOF
