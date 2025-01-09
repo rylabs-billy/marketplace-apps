@@ -36,7 +36,7 @@ jobs:
           pebble_ca=$(realpath test/certs/pebble.minica.pem)
           echo "pebble_ca_path=$pebble_ca" >> $GITHUB_ENV
           echo $pebble_ca
-          ls ~/go/bin/
+          ls $HOME/go/bin/
           echo "~/go/bin" >> $GITHUB_PATH
           echo this
           pebble -config test/config/pebble-config.json >> /dev/null
