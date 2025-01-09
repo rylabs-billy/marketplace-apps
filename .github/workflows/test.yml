@@ -10,6 +10,9 @@ on:
         required: false
         default: ubuntu-latest
         type: string
+      certbot:
+        required: false
+        type: bool
 
 jobs:
   test:
@@ -41,6 +44,10 @@ jobs:
         env:
           APP: ${{ inputs.app-name }}
           TOKEN_PASSWORD: ${{ secrets.LINODE_TOKEN }}
+
+      - name: Mock certbot
+        if: ${{ inputs.certbot == true }}
+        run: sudo -E .apps/linode_helpers/scripts/certbot-test.sh
 
       - name: Deploy playbook
         shell: bash

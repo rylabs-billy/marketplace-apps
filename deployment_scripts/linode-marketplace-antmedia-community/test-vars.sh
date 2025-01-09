@@ -7,28 +7,31 @@
 # NOTE: For local testing, manually set the $BRANCH and $GIT_REPO environment
 # variables as needed.
 
+source ../../helpers/utils.sh
+
 declare -A UDF_VARS
 UDF_VARS["USER_NAME"]="testuser"
 UDF_VARS["DISABLE_ROOT"]="Yes"
 UDF_VARS["SUBDOMAIN"]="test"
-UDF_VARS["DOMAIN"]="linode.com" 
-UDF_VARS["SOA_EMAIL_ADDRESS"]="noreply@linode.com" 
-
-
-github_env() {
-  local KEY="$1"
-  local VALUE="$2"
-  if [ -n "$GITHUB_ENV" ]; then
-    echo "$KEY=$VALUE" | tee -a $GITHUB_ENV
-  fi
-}
-
-set_vars() {
-  for key in "${!UDF_VARS[@]}"; do
-    export "${key}"="${UDF_VARS[$key]}"
-    github_env "${key}" "${UDF_VARS[$key]}"
-  done
-}
+UDF_VARS["DOMAIN"]="example.com" 
+UDF_VARS["SOA_EMAIL_ADDRESS"]="test@example.com"
 
 # main
-set_vars
+set_vars $UDF_VARS
+
+# github_env() {
+#   local KEY="$1"
+#   local VALUE="$2"
+#   if [ -n "$GITHUB_ENV" ]; then
+#     echo "$KEY=$VALUE" | tee -a $GITHUB_ENV
+#   fi
+# }
+
+# set_vars() {
+#   for key in "${!UDF_VARS[@]}"; do
+#     export "${key}"="${UDF_VARS[$key]}"
+#     github_env "${key}" "${UDF_VARS[$key]}"
+#   done
+# }
+
+
