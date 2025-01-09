@@ -39,6 +39,7 @@ jobs:
           echo "~/go/bin" >> $GITHUB_PATH
           echo this
           pebble -config test/config/pebble-config.json >> /dev/null
+          echo that
           echo $GITHUB_WORKSPACE
 
       - name: Test certbot
