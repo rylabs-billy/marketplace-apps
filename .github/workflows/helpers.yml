@@ -26,33 +26,28 @@ jobs:
         run: |-
           cd /tmp
           git clone https://github.com/letsencrypt/pebble/
+
           cd pebble
-          
           go install ./cmd/pebble
           sed -ie 's/"httpPort"\: .*/"httpPort"\: 80,/g' test/config/pebble-config.json
           sed -ie 's/"tlsPort"\: .*/"tlsPort"\: 443,/g' test/config/pebble-config.json
-          
           cat test/config/pebble-config.json
+
           pebble_ca=$(realpath test/certs/pebble.minica.pem)
           echo "pebble_ca_path=$pebble_ca" >> $GITHUB_ENV
-          echo $pebble_ca
-          ls $HOME/go/bin/
           echo "$HOME/go/bin" >> $GITHUB_PATH
-          echo this
           pebble -config test/config/pebble-config.json > /dev/null 2>&1 &
-          echo that
-          echo $GITHUB_WORKSPACE
-
+          
       - name: Test certbot
         shell: bash
         run: |-
-          pwd
-          ls /etc/hosts
-          ls etc/hosts
+          sudo echo "127.0.0.201 $DOMAIN $SUBDOMAIN.$DOMAIN" | tee -a /etc/hosts
           sudo apt install python3-certbot -y
-          sudo REQUESTS_CA_BUNDLE=$CA_BUNDLE certbot -n --standalone --agree-tos --redirect certonly \
-            -d $DOMAIN -m $SOA_EMAIL --server https://localhost:14000/dir 
+          sudo REQUESTS_CA_BUNDLE=$CA_BUNDLE certbot -n --standalone \
+            --agree-tos --redirect certonly -d $DOMAIN -d $SUBDOMAIN.$DOMAIN \
+            -m $SOA_EMAIL --server https://localhost:14000/dir
         env:
-          DOMAIN: test.example.com
+          DOMAIN: example.com
+          SUBDOMAIN: test
           SOA_EMAIL: test@example.com
           CA_BUNDLE: ${{ env.pebble_ca_path }}
