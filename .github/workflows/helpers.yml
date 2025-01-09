@@ -41,8 +41,8 @@ jobs:
       - name: Test certbot
         shell: bash
         run: |-
-          sudo echo >> /etc/hosts
-          sudo echo "127.0.0.201 $DOMAIN $SUBDOMAIN.$DOMAIN" >> /etc/hosts
+          echo "127.0.0.201 $DOMAIN $SUBDOMAIN.$DOMAIN" | sudo tee -a /etc/hosts
+          sudo cat /etc/hosts
           sudo apt install python3-certbot -y
           sudo REQUESTS_CA_BUNDLE=$CA_BUNDLE certbot -n --standalone \
             --agree-tos --redirect certonly -d $DOMAIN -d $SUBDOMAIN.$DOMAIN \
