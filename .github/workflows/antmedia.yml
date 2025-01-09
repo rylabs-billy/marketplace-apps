@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - develop
-      - antmedia-ci
+      # - antmedia-ci
     # paths:
     #   - 'apps/linode-marketplace-antmedia-community/**'
     #   - 'deployment_scripts/linode-marketplace-antmedia-community/**'
