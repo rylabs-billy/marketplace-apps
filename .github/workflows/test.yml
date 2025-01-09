@@ -4,15 +4,18 @@ on:
   workflow_call:
     inputs:
       app-name:
+        description: "Marketplace app name"
         required: true
         type: string
       platform:
+        description: "OS image"
         required: false
         default: ubuntu-latest
         type: string
       certbot:
+        description: "Enable certbot testing helper"
         required: false
-        type: bool
+        type: boolean
 
 jobs:
   test:
