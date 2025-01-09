@@ -16,30 +16,32 @@ jobs:
   certbot:
     runs-on: ubuntu-latest
     steps:
-      - name: Install GO
+      - name: Install go
         uses: actions/setup-go@v5
         with:
           go-version: '^1.23.3'
 
-      - name: Setup Pebble for mock certs
+      - name: Setup pebble for mock certs
         shell: bash
         run: |-
           cd /tmp
           git clone https://github.com/letsencrypt/pebble/
           cd pebble
           go install ./cmd/pebble
-          sed -e 's/"httpPort"\: .*/"httpPort"\: 80/g' 
-          sed -e 's/"tlsPort"\: .*/"tlsPort"\: 443/g'
+          sed -e 's/"httpPort"\: .*/"httpPort"\: 80/g' test/config/pebble-config.json
+          sed -e 's/"tlsPort"\: .*/"tlsPort"\: 443/g' test/config/pebble-config.json
           pebble_ca=$(realpath test/certs/pebble.minica.pem)
           echo "pebble_ca_path=$pebble_ca" >> $GITHUB_ENV
           echo "~/go/bin" >> $GITHUB_PATH
           pebble -config test/config/pebble-config.json > /dev/null
           echo $GITHUB_WORKSPACE
 
-      - name: test certbot
+      - name: Test certbot
         shell: bash
         run: |-
           pwd
+          ls /etc/hosts
+          ls etc/hosts
           sudo apt install python3-certbot -y
           sudo REQUESTS_CA_BUNDLE=$CA_BUNDLE certbot -n --standalone --agree-tos --redirect certonly \
             -d $DOMAIN -m $SOA_EMAIL --server https://localhost:14000/dir 
