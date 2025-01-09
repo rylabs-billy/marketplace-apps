@@ -7,6 +7,9 @@
 # NOTE: For local testing, manually set the $BRANCH and $GIT_REPO environment
 # variables as needed.
 
+echo YYYYYYY
+pwd
+
 source helpers/utils.sh
 
 declare -A UDF_VARS
