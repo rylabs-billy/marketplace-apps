@@ -7,10 +7,6 @@
 # NOTE: For local testing, manually set the $BRANCH and $GIT_REPO environment
 # variables as needed.
 
-echo YYYYYYY
-pwd
-ls -la
-
 source ./helpers/utils.sh
 
 declare -A UDF_VARS
@@ -20,8 +16,11 @@ UDF_VARS["SUBDOMAIN"]="test"
 UDF_VARS["DOMAIN"]="example.com" 
 UDF_VARS["SOA_EMAIL_ADDRESS"]="test@example.com"
 
-# main
-set_vars $UDF_VARS
+for key in "${!UDF_VARS[@]}"; do
+  export $key="${UDF_VARS[$key]}"
+  github:env "$key" "${UDF_VARS[$key]}"
+done
+
 
 
 # github_env() {
