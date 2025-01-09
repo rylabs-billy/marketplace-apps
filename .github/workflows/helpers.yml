@@ -39,7 +39,7 @@ jobs:
           ls $HOME/go/bin/
           echo "$HOME/go/bin" >> $GITHUB_PATH
           echo this
-          pebble -config test/config/pebble-config.json
+          pebble -config test/config/pebble-config.json > /dev/null 2>&1 &
           echo that
           echo $GITHUB_WORKSPACE
 
