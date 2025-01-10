@@ -54,18 +54,19 @@ jobs:
           APP: ${{ inputs.app-name }}
           TOKEN_PASSWORD: ${{ secrets.LINODE_TOKEN }}
 
-      - name: Mock certbot
-        if: ${{ inputs.certbot == true }}
-        run: sudo -E ./helpers/certbot-test.sh
+      # - name: Mock certbot
+      #   if: ${{ inputs.certbot == true }}
+      #   run: sudo -E ./helpers/certbot-test.sh
 
       - name: Deploy playbook
         shell: bash
         run: |-
           if [ ${{ inputs.certbot }} == true ]; then
-            source ./helpers/utils.sh
+            source ./lib/certbot.sh
+            certbot:configure
             export -f certbot
           fi
-          ./helpers/test.sh
+          ./lib/test.sh
           sudo -E ./deployment_scripts/linode-marketplace-$APP/$APP-deploy.sh
         env:
           APP: ${{ inputs.app-name }}
