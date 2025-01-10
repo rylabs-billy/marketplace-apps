@@ -46,4 +46,5 @@ var_chk () {
   err_msg="missing value for $"
   for var in "${vars_list[@]}"; do
     [ -z "${var}" ] && _err "${var}"
+  done
 }

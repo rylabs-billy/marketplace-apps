@@ -51,8 +51,8 @@ certbot:configure () {
 
 certbot() {
   args="$@"
-  var_chk "CA_BUNDLE"
-  certbot_cmd="REQUESTS_CA_BUNDLE=${CA_BUNDLE} $(which certbot) ${args} "
+  var_chk "pebble_ca"
+  certbot_cmd="REQUESTS_CA_BUNDLE=${pebble_ca} $(which certbot) ${args} "
   certbot_cmd+="--server https://localhost:14000/dir"
   eval "${certbot_cmd}"
 }
