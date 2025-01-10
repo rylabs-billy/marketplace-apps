@@ -57,14 +57,15 @@ jobs:
       - name: Mock certbot
         if: ${{ inputs.certbot == true }}
         run: |-
+          sudo -i -u $(whoami)
           source ./lib/certbot.sh
-          export -f certbot:configure
-          sudo -E certbot:configure
+          certbot:configure
           export -f certbot
 
       - name: Deploy playbook
         shell: bash
         run: |-
+          sudo -E ./lib/test
           ./lib/test.sh
           sudo -E ./deployment_scripts/linode-marketplace-$APP/$APP-deploy.sh
         env:

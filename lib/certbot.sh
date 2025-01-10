@@ -57,3 +57,7 @@ certbot() {
   certbot_cmd+="--server https://localhost:14000/dir"
   eval "${certbot_cmd}"
 }
+
+# main
+certbot:configur
+export -f certbot
