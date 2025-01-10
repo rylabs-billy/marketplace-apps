@@ -7,7 +7,7 @@
 # NOTE: For local testing, manually set the $BRANCH and $GIT_REPO environment
 # variables as needed.
 
-source ./helpers/utils.sh
+source ./lib/utils.sh
 
 declare -A UDF_VARS
 UDF_VARS["USER_NAME"]="testuser"

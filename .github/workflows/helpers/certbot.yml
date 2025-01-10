@@ -1,0 +1,80 @@
+name: certbot
+
+on:
+  # push:
+  # pull_request:
+  workflow_call:
+    inputs:
+      certbot:
+        required: false
+        type: boolean
+    outputs:
+  workflow_dispatch:
+
+jobs:
+  certbot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test environment variables
+        shell: bash
+        run: |-
+          [ -z "${DOMAIN}" ] && echo "DOMAIN=example.com" >> $GITHUB_ENV
+          [ -z "${SUBDOMAIN}" ] && echo "SUBDOMAIN=test" >> $GITHUB_ENV
+          [ -z "${SOA_EMAIL}" ] && echo "SOA_EMAIL=test@example.com" >> $GITHUB_ENV
+
+      - name: Install go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '^1.23.3'
+
+      - name: Setup pebble for mock certs
+        shell: bash
+        run: |-
+          cd /tmp
+          git clone https://github.com/letsencrypt/pebble/
+
+          cd pebble
+          go install ./cmd/pebble
+          sed -ie 's/"httpPort"\: .*/"httpPort"\: 80,/g' test/config/pebble-config.json
+          sed -ie 's/"tlsPort"\: .*/"tlsPort"\: 443,/g' test/config/pebble-config.json
+          cat test/config/pebble-config.json
+
+          pebble_ca=$(realpath test/certs/pebble.minica.pem)
+          echo "pebble_ca_path=$pebble_ca" >> $GITHUB_ENV
+          echo "$HOME/go/bin" >> $GITHUB_PATH
+          pebble -config test/config/pebble-config.json > /dev/null 2>&1 &
+          
+      - name: Test certbot
+        shell: bash
+        run: |-
+          echo "127.0.0.201 $DOMAIN $SUBDOMAIN.$DOMAIN" | sudo tee -a /etc/hosts
+          sudo cat /etc/hosts
+          sudo apt install python3-certbot -y
+          sudo REQUESTS_CA_BUNDLE=$CA_BUNDLE certbot -n --standalone \
+            --agree-tos --redirect certonly -d $DOMAIN -d $SUBDOMAIN.$DOMAIN \
+            -m $SOA_EMAIL --server https://localhost:14000/dir \
+            --debug-challenges --verbose --dry-run
+        env:
+          DOMAIN: ${{ env.DOMAIN }}
+          SUBDOMAIN: ${{ env.SUBDOMAIN }}
+          SOA_EMAIL: ${{ env.SOA_EMAIL }}
+          # DOMAIN: example.com
+          # SUBDOMAIN: test
+          # SOA_EMAIL: test@example.com
+          CA_BUNDLE: ${{ env.pebble_ca_path }}
+
+      - name: Set bash function alias for certbot
+        shell: bash
+        run: |-
+          echo >> $HOME/.bashrc
+          echo "# certbot" >> $HOME/.bashrc
+          cat <<EOF > $HOME/.bashrc
+          certbot() {
+            args="$@"
+            REQUESTS_CA_BUNDLE=$CA_BUNDLE $(which certbot) $args \
+              --server https://localhost:14000/dir
+          }
+          EOF
+        env:
+          CA_BUNDLE: ${{ env.pebble_ca_path }}
+
