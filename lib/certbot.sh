@@ -61,4 +61,5 @@ certbot() {
 # main
 certbot:configure
 bashrc certbot
+source "${HOME}/.bashrc
 
