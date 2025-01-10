@@ -61,7 +61,7 @@ jobs:
       - name: Deploy playbook
         shell: bash
         run: |-
-          source .helpers/utils.sh
+          source ./helpers/utils.sh
           certbot_alias
           sudo -E ./deployment_scripts/linode-marketplace-$APP/$APP-deploy.sh
         env:
