@@ -44,7 +44,7 @@ var_chk () {
   }
 
   for var in "${vars_list[@]}"; do
-    v=$(echo )
-    [ -z "${!var}" ] && _err "${var}"
+    v=$(echo "${!var}")
+    [ -z "${v}" ] && _err "${var}"
   done
 }
