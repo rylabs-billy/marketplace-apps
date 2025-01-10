@@ -53,11 +53,13 @@ var_chk () {
 }
 
 bashrc () {
-  local cmd_name="${1}"
-  local func_name="${2}"
-  echo >> "${HOME}/.bashrc"
-  declare -f "${func_name}" >> "${HOME}/.bashrc"
-  echo "alias ${cmd_name}=\"${func_name}\"" >> "${HOME}/.bashrc"
-  tail "${HOME}/.bashrc"
-  source "${HOME}/.bashrc"
+  # local cmd_name="${1}"
+  local func_name="${1}"
+
+  [ "$(whoami)" == "root" ] && local home="/root" || local home="/home/$(whoami)"
+  echo >> "${home}/.bashrc"
+  declare -f "${func_name}" >> "${home}/.bashrc"
+  # echo "alias ${cmd_name}=\"${func_name}\"" >> "${home}/.bashrc"
+  tail "${home}/.bashrc"
+  source "${home}/.bashrc"
 }
