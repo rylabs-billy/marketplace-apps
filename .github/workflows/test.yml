@@ -57,10 +57,9 @@ jobs:
       - name: Mock certbot
         if: ${{ inputs.certbot == true }}
         run: |-
-          sudo -i -u $(whoami)
-          source ./lib/certbot.sh
-          certbot:configure
-          export -f certbot
+          sudo -E ./lib/certbot.sh
+          # certbot:configure
+          # export -f certbot
 
       - name: Deploy playbook
         shell: bash

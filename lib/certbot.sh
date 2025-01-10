@@ -59,5 +59,5 @@ certbot() {
 }
 
 # main
-# certbot:configur
-# export -f certbot
+certbot:configure
+export -f certbot
