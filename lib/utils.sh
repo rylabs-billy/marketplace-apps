@@ -56,5 +56,7 @@ bashrc () {
   local func_name="${1}"
   echo >> "${HOME}/.bashrc"
   declare -f "${func_name}" >> "${HOME}/.bashrc"
+  echo "alias ${func_name}=\"${func_name}\"" >> "${HOME}/.bashrc"
   tail "${HOME}/.bashrc"
+  source "${HOME}/.bashrc"
 }
