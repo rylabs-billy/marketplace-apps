@@ -16,3 +16,13 @@ github:env () {
     echo "$key=$value" | tee -a $GITHUB_ENV
   fi
 }
+
+certbot_alias () {
+  certbot() {
+    args="$@"
+    REQUESTS_CA_BUNDLE="${CA_BUNDLE}" $(which certbot) "${args}" \
+      --server https://localhost:14000/dir
+  }
+  
+  export -f certbot
+}

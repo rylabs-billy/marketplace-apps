@@ -60,10 +60,14 @@ jobs:
 
       - name: Deploy playbook
         shell: bash
-        run: sudo -E ./deployment_scripts/linode-marketplace-$APP/$APP-deploy.sh
+        run: |-
+          source .helpers/utils.sh
+          certbot_alias
+          sudo -E ./deployment_scripts/linode-marketplace-$APP/$APP-deploy.sh
         env:
           APP: ${{ inputs.app-name }}
           TOKEN_PASSWORD: ${{ secrets.LINODE_TOKEN }}
+          CA_BUNDLE: ${{ env.pebble_ca_path }}
 
       - name: Validate playbook success
         shell: bash

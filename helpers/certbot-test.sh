@@ -49,9 +49,9 @@ test_cerbot () {
 }
 
 certbot_alias () {
-  echo >> "${HOME}/.bashrc"
-  echo "# certbot" >> "${HOME}/.bashrc"
-  cat <<EOF > "${HOME}/.bashrc"
+  echo >> ${HOME}/.bashrc
+  echo "# certbot" >> ${HOME}/.bashrc
+  cat <<EOF >> ${HOME}/.bashrc
 certbot() {
   args="$@"
   REQUESTS_CA_BUNDLE="${CA_BUNDLE}" $(which certbot) "${args}" \
@@ -59,6 +59,18 @@ certbot() {
 }
 EOF
 }
+
+# certbot_alias () {
+#   echo >> ${HOME}/.bashrc
+#   echo "# certbot" >> ${HOME}/.bashrc
+#   cat <<EOF >> ${HOME}/.bashrc
+# certbot() {
+#   args="$@"
+#   REQUESTS_CA_BUNDLE="${CA_BUNDLE}" $(which certbot) "${args}" \
+#     --server https://localhost:14000/dir
+# }
+# EOF
+# }
 
 # main
 install_go
