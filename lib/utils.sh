@@ -28,7 +28,7 @@ install_go () {
 
   curl -sLO "https://go.dev/dl/${package}"
   echo "${checksum} ${package}" | sha256sum -c
-  rm -rf /usr/local/go && tar -C /usr/local -xzf "${package}"
+  sudo -i -u $(whoami) -- rm -rf /usr/local/go && tar -C /usr/local -xzf "${package}"
   export PATH="${PATH}:/usr/local/go/bin:${HOME}/go/bin"
   echo "export PATH=${PATH}:/usr/local/go/bin:${HOME}/go/bin" | tee -a "${HOME}/.bashrc"
   github:path "${PATH}"
@@ -39,11 +39,11 @@ var_chk () {
   local vars_list=("$@")
 
   _ok () {
-    printf "\u2705  ${1} variable is set" && return 0
+    printf "\u2705  ${1} variable is set\n" && return 0
   }
 
   _err () {
-    printf "\u274c  ${1} variable is not set" && return 1
+    printf "\u274c  ${1} variable is not set\n" && return 1
   }
 
   for var in "${vars_list[@]}"; do
