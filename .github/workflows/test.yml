@@ -62,7 +62,8 @@ jobs:
         shell: bash
         run: |-
           source ./helpers/utils.sh
-          certbot_alias
+          export -f certbot
+          ./helpers/test.sh
           sudo -E ./deployment_scripts/linode-marketplace-$APP/$APP-deploy.sh
         env:
           APP: ${{ inputs.app-name }}
