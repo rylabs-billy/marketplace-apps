@@ -50,7 +50,7 @@ certbot:configure () {
   certbot:test "${pebble_ca}"
 }
 
-certbot() {
+certbot_alias() {
   args="$@"
   var_chk "pebble_ca"
   certbot_cmd="REQUESTS_CA_BUNDLE=${pebble_ca} $(which certbot) ${args} "
@@ -60,6 +60,6 @@ certbot() {
 
 # main
 certbot:configure
-bashrc certbot
+bashrc certbot certbot_alias
 source "${HOME}"/.bashrc
 
