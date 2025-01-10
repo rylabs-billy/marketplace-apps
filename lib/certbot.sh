@@ -7,22 +7,23 @@ readonly workdir=$(pwd)
 source ./lib/utils.sh
 
 certbot:pebble () {
-    mkdir -p /tmp/certbot && cd /tmp/certbot
-    git clone https://github.com/letsencrypt/pebble/
-    cd pebble
-    go install ./cmd/pebble
+  echo "[info] setting up pebble"
+  mkdir -p /tmp/certbot && cd /tmp/certbot
+  git clone https://github.com/letsencrypt/pebble/
+  cd pebble
+  go install ./cmd/pebble
 
-    sed -ie 's/"httpPort"\: .*/"httpPort"\: 80,/g' test/config/pebble-config.json
-    sed -ie 's/"tlsPort"\: .*/"tlsPort"\: 443,/g' test/config/pebble-config.json
-    cat test/config/pebble-config.json
+  sed -ie 's/"httpPort"\: .*/"httpPort"\: 80,/g' test/config/pebble-config.json
+  sed -ie 's/"tlsPort"\: .*/"tlsPort"\: 443,/g' test/config/pebble-config.json
+  cat test/config/pebble-config.json
 
-    pebble_ca=$(realpath test/certs/pebble.minica.pem)
-    export pebble_ca="${pebble_ca}"
-    github:env "pebble_ca" "${pebble_ca}"
+  pebble_ca=$(realpath test/certs/pebble.minica.pem)
+  export pebble_ca="${pebble_ca}"
+  github:env "pebble_ca" "${pebble_ca}"
 
-    # run pebble as a background process
-    pebble -config test/config/pebble-config.json > /dev/null 2>&1 &
-    cd $workdir
+  # run pebble as a background process
+  pebble -config test/config/pebble-config.json > /dev/null 2>&1 &
+  cd "${workdir}"
 }
 
 certbot:test () {
@@ -40,18 +41,18 @@ certbot:test () {
 
 certbot:configure () {
   echo "[info] configuring mock certbot"
-  var_chk "DOMAIN" "SUBDOMAIN" "SOA_EMAIL_ADDRESS"
+  var_chk '$DOMAIN' '$SUBDOMAIN' '$SOA_EMAIL_ADDRESS'
 
   install_go
   certbot:pebble
 
-  var_chk "pebble_ca"
+  var_chk '$pebble_ca'
   certbot:test "${pebble_ca}"
 }
 
 certbot() {
   args="$@"
-  var_chk "pebble_ca"
+  var_chk '$pebble_ca'
   certbot_cmd="REQUESTS_CA_BUNDLE=${pebble_ca} $(which certbot) ${args} "
   certbot_cmd+="--server https://localhost:14000/dir"
   eval "${certbot_cmd}"

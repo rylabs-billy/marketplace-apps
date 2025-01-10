@@ -39,11 +39,10 @@ var_chk () {
   local vars_list=("$@")
 
   _err () {
-    echo "Error: missing or incorrect value for \$${1} variable"
+    echo "Error: missing or incorrect value for ${1} variable"
     exit 1
   }
 
-  err_msg="missing value for $"
   for var in "${vars_list[@]}"; do
     [ -z "${var}" ] && _err "${var}"
   done
