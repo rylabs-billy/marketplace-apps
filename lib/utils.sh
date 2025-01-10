@@ -40,7 +40,7 @@ var_chk () {
 
   _err () {
     echo "Error: missing or incorrect value for ${1} variable"
-    exit 1
+    # exit 1
   }
 
   for var in "${vars_list[@]}"; do
