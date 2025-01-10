@@ -41,18 +41,18 @@ certbot:test () {
 
 certbot:configure () {
   echo "[info] configuring mock certbot"
-  var_chk '$DOMAIN' '$SUBDOMAIN' '$SOA_EMAIL_ADDRESS'
+  var_chk "DOMAIN" "SUBDOMAIN" "SOA_EMAIL_ADDRESS"
 
   install_go
   certbot:pebble
 
-  var_chk '$pebble_ca'
+  var_chk "pebble_ca"
   certbot:test "${pebble_ca}"
 }
 
 certbot() {
   args="$@"
-  var_chk '$pebble_ca'
+  var_chk "pebble_ca"
   certbot_cmd="REQUESTS_CA_BUNDLE=${pebble_ca} $(which certbot) ${args} "
   certbot_cmd+="--server https://localhost:14000/dir"
   eval "${certbot_cmd}"

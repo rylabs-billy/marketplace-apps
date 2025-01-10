@@ -41,11 +41,11 @@ jobs:
           echo "[info] git branch: $BRANCH"
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
 
-      - name: Setup tmate session for debugging
-        uses: mxschmitt/action-tmate@v3
-        # if: ${{ !cancelled() && github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
-        with:
-          detached: true
+      # - name: Setup tmate session for debugging
+      #   uses: mxschmitt/action-tmate@v3
+      #   # if: ${{ !cancelled() && github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+      #   with:
+      #     detached: true
 
       - name: Set test UDFs
         shell: bash
