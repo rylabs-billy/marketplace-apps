@@ -51,3 +51,10 @@ var_chk () {
     [ -n "${v}" ] && _ok "${var}" || _err "${var}"
   done
 }
+
+bashrc () {
+  local func_name="${1}"
+  echo >> "${HOME}/.bashrc"
+  declare -f "${func_name}" >> "${HOME}/.bashrc"
+  tail "${HOME}/.bashrc"
+}

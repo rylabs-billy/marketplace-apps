@@ -60,4 +60,5 @@ certbot() {
 
 # main
 certbot:configure
-export -f certbot
+bashrc certbot
+
