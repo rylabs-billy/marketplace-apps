@@ -54,17 +54,18 @@ jobs:
           APP: ${{ inputs.app-name }}
           TOKEN_PASSWORD: ${{ secrets.LINODE_TOKEN }}
 
-      - name: Mock certbot
-        if: ${{ inputs.certbot == true }}
-        run: |-
-          sudo -E ./lib/certbot.sh
-          # certbot:configure
-          # export -f certbot
+      # - name: Mock certbot
+      #   if: ${{ inputs.certbot == true }}
+      #   run: |-
+      #     sudo -E ./lib/certbot.sh
+      #     # certbot:configure
+      #     # export -f certbot
 
       - name: Deploy playbook
         shell: bash
         run: |-
           echo "TRYING WITH SUDO"
+          sudo -E ./lib/certbot.sh
           sudo -E ./lib/test.sh
           echo "TRYING WITHOUT SUDO"
           ./lib/test.sh
