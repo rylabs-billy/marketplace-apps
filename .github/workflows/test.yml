@@ -58,7 +58,7 @@ jobs:
         if: ${{ inputs.certbot == true }}
         run: |-
           source ./lib/certbot.sh
-          certbot:configure
+          sudo -E certbot:configure
           export -f certbot
 
       - name: Deploy playbook

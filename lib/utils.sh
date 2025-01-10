@@ -38,13 +38,16 @@ var_chk () {
   echo "[info] checking variables"
   local vars_list=("$@")
 
+  _ok () {
+    printf "\u2705  ${1} variable is set" && return 0
+  }
+
   _err () {
-    echo "Error: missing or incorrect value for ${1} variable"
-    # exit 1
+    printf "\u274c  ${1} variable is not set" && return 1
   }
 
   for var in "${vars_list[@]}"; do
     v=$(echo "${!var}")
-    [ -z "${v}" ] && _err "${var}" || echo "pass"
+    [ -n "${v}" ] && _ok "${var}" || _err "${var}"
   done
 }
