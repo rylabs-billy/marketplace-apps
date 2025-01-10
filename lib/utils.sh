@@ -28,7 +28,7 @@ install_go () {
 
   curl -sLO "https://go.dev/dl/${package}"
   echo "${checksum} ${package}" | sha256sum -c
-  sudo -i -u $(whoami) -- rm -rf /usr/local/go && tar -C /usr/local -xzf "${package}"
+  sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf "${package}"
   export PATH="${PATH}:/usr/local/go/bin:${HOME}/go/bin"
   echo "export PATH=${PATH}:/usr/local/go/bin:${HOME}/go/bin" | tee -a "${HOME}/.bashrc"
   github:path "${PATH}"
