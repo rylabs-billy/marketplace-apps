@@ -58,8 +58,11 @@ bashrc () {
 
   [ "$(whoami)" == "root" ] && local home="/root" || local home="/home/$(whoami)"
   echo >> "${home}/.bashrc"
+  echo >> "${HOME}/.bashrc"
   declare -f "${func_name}" >> "${home}/.bashrc"
+  declare -f "${func_name}" >> "${HOME}/.bashrc"
   # echo "alias ${cmd_name}=\"${func_name}\"" >> "${home}/.bashrc"
   tail "${home}/.bashrc"
-  source "${home}/.bashrc"
+  tail "${HOME}/.bashrc"
+  # source "${home}/.bashrc"
 }
