@@ -20,6 +20,7 @@ github:env () {
 
 certbot() {
   args="$@"
-  REQUESTS_CA_BUNDLE="${CA_BUNDLE}" $(which certbot) "${args}" \
-    --server https://localhost:14000/dir
+  certbot_cmd="REQUESTS_CA_BUNDLE=${CA_BUNDLE} $(which certbot) ${args} "
+  certbot_cmd+="--server https://localhost:14000/dir"
+  eval "${certbot_cmd}"
 }

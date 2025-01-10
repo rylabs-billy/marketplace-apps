@@ -61,8 +61,10 @@ jobs:
       - name: Deploy playbook
         shell: bash
         run: |-
-          source ./helpers/utils.sh
-          export -f certbot
+          if [ ${{ inputs.certbot }} == true ]; then
+            source ./helpers/utils.sh
+            export -f certbot
+          fi
           ./helpers/test.sh
           sudo -E ./deployment_scripts/linode-marketplace-$APP/$APP-deploy.sh
         env:
