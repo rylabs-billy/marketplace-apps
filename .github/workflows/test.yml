@@ -64,7 +64,9 @@ jobs:
       - name: Deploy playbook
         shell: bash
         run: |-
-          sudo -E ./lib/test
+          echo "TRYING WITH SUDO"
+          sudo -E ./lib/test.sh
+          echo "TRYING WITHOUT SUDO"
           ./lib/test.sh
           sudo -E ./deployment_scripts/linode-marketplace-$APP/$APP-deploy.sh
         env:
