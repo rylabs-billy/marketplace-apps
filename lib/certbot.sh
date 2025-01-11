@@ -60,7 +60,6 @@ certbot:build () {
 
 certbot:config () {
   local server="https://localhost:14000/dir"
-  local config_file="/etc/letsencrypt/deploy-cli.ini"
   local cli_ini=$(printf "%s\n" \
   "key-type = ecdsa" \
   "elliptic-curve = secp384r1" \
@@ -74,7 +73,7 @@ certbot:config () {
   "redirect = true" \
   "max-log-backups = 0")
 
-  export config_file="${config_file}"
+  export config_file="/etc/letsencrypt/deploy-cli.ini"
   github:env "config_file" "${config_file}"
   echo "${cli_ini}" | sed 's/- /  - /g' > "${config_file}"
 }
