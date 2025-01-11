@@ -66,10 +66,10 @@ certbot:config () {
   "authenticator = standalone" \
   "domains = ${DOMAIN},${SUBDOMAIN}.${DOMAIN}" \
   "server = ${server}" \
-  "non-interactive = true" \
+  "non-interactive = True" \
   "email = ${SOA_EMAIL_ADDRESS}" \
-  "agree-tos = true" \
-  "redirect = true" \
+  "agree-tos = True" \
+  "redirect = True" \
   "max-log-backups = 0")
 
   export config_file="/etc/letsencrypt/deploy-cli.ini"
