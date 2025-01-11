@@ -16,6 +16,7 @@
   set_fact:
     certbot_plugin: "{{ item.name if webserver_stack == item.stack | default('standalone') }}"
     certbot_package: "{{ item.package if webserver_stack == item.stack | default('python3-certbot') }}"
+    certonly: "{% true if not (webserver_stack) else false %}"
     # certbot_plugin: {{ standalone }}
     config_file: /etc/letsencrypt/deploy-cli.ini
     cacheable: yes
@@ -47,7 +48,7 @@
 
 # certbot dry-run
 - name: run certbot dry-run 
-  shell: certbot --config {{ config_file }} --dry-run
+  shell: certbot {% if certonly %}certonly{% endif %} --config {{ config_file }} --dry-run
   register: dry_run
   until: dry_run is not failed
   retries: 3
@@ -66,7 +67,7 @@
 
 # get certs
 - name: install live certificate
-  shell: certbot --config {{ config_file }}
+  shell: certbot {% if certonly %}certonly{% endif %} --config {{ config_file }}
   environment:
     REQUESTS_CA_BUNDLE: '{{ ca_bundle | default(omit) }}'
 
