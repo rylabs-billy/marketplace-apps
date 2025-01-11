@@ -64,7 +64,7 @@ certbot:config () {
   "key-type = ecdsa" \
   "elliptic-curve = secp384r1" \
   "authenticator = standalone" \
-  "certonly = true" \
+  "certonly = True" \
   "domains = ${DOMAIN},${SUBDOMAIN}.${DOMAIN}" \
   "server = ${server}" \
   "non-interactive = true" \
