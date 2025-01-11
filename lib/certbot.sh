@@ -35,7 +35,7 @@ certbot:test () {
   # apt install python3-certbot -y
   # echo "${test_ip} ${DOMAIN} ${SUBDOMAIN}.${DOMAIN}" | tee -a /etc/hosts
 
-  REQUESTS_CA_BUNDLE="${ca_bundle}" certbot --config "${config_file}" \
+  REQUESTS_CA_BUNDLE="${ca_bundle}" certbot certonly --config "${config_file}" \
     --debug-challenges --verbose --dry-run
 
   # REQUESTS_CA_BUNDLE="${ca_bundle}" $(which certbot) -n --standalone --agree-tos \
@@ -64,7 +64,6 @@ certbot:config () {
   "key-type = ecdsa" \
   "elliptic-curve = secp384r1" \
   "authenticator = standalone" \
-  "certonly = True" \
   "domains = ${DOMAIN},${SUBDOMAIN}.${DOMAIN}" \
   "server = ${server}" \
   "non-interactive = true" \
