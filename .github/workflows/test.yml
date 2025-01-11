@@ -66,6 +66,7 @@ jobs:
         run: |-
           # echo "TRYING WITH SUDO"
           # sudo -E ./lib/certbot.sh
+          tail ~/.bashrc && sudo tail ~/.bashrc
           sudo -E ./lib/test.sh
           echo "TRYING WITHOUT SUDO"
           ./lib/test.sh

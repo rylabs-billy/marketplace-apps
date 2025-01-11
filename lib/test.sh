@@ -1,8 +1,10 @@
 #!/bin/bash
 set -x
 
-certbot -n --standalone --agree-tos --redirect certonly \
-  -d "${DOMAIN}" -d "${SUBDOMAIN}.${DOMAIN}" -m "${SOA_EMAIL_ADDRESS}"
+certbot --config "${config_file}" -vvv
+
+# certbot -vvv -n --standalone --agree-tos --redirect certonly \
+#   -d "${DOMAIN}" -d "${SUBDOMAIN}.${DOMAIN}" -m "${SOA_EMAIL_ADDRESS}"
 
 echo sleeping....
 echo

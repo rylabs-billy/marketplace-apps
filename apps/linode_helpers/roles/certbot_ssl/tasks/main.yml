@@ -1,17 +1,98 @@
 ---
 # apps/linode_helpers/roles/certbot_ssl/tasks/main.yml
 # import some DNS propagation task before getting cert
-- name: install apache certbot plugin
-  include_tasks:
-    file: apache-certbot.yml
-  when: webserver_stack == 'lamp'
 
-- name: install nginx certbot plugin
-  include_tasks:
-    file: nginx-certbot.yml
-  when: webserver_stack == 'lemp'
+# apps/linode_helpers/roles/certbot_ssl/tasks/apache-certbot.yml
 
-- name: install certbot standalone plugin
-  include_tasks:
-    file: standalone-certbot.yml
-  when: webserver_stack == 'standalone'
+# - name: set certbot plugin facts
+#   set_fact:
+#     installer_plugins:
+#       - name: nginx
+#         stack: lemp
+#       - name: apache
+#         stack: lamp
+
+- name: set certbot facts
+  set_fact:
+    certbot_plugin: "{{ item.name if webserver_stack == item.stack | default('standalone') }}"
+    certbot_package: "{{ item.package if webserver_stack == item.stack | default('python3-certbot') }}"
+    # certbot_plugin: {{ standalone }}
+    config_file: /etc/letsencrypt/deploy-cli.ini
+    cacheable: yes
+  loop:
+    - name: nginx
+      stack: lemp
+      package: python3-certbot-nginx
+    - name: apache
+      stack: lamp
+      package: python3-certbot-apache
+    
+- name: install certbot
+  apt:
+    name: '{{ certbot_package }}'
+    state: present
+
+- name: check for acme test server
+  shell: nc -nvz 127.0.0.1 14000 2>&1 || /bin/true
+  register: test_server
+  tags: test
+
+- name: write certbot config file
+  template:
+    src: templates/cli.ini.j2
+    dest: '{{ config_file }}'
+    owner: root
+    group: root
+    mode: '0644'
+
+# certbot dry-run
+- name: run certbot dry-run 
+  shell: certbot --config {{ config_file }} --dry-run
+  register: dry_run
+  until: dry_run is not failed
+  retries: 3
+  delay: 3
+  ignore_errors: true
+  environment:
+    REQUESTS_CA_BUNDLE: '{{ ca_bundle | default(omit) }}'
+
+# assert that we can get valid certs. Otherwise fail - can't achieve final state
+- name: validate certbot dry-run
+  assert:
+    that: dry_run is not failed
+    fail_msg: "[Error] Certbot dry-run domain. Please check /var/log/letsencrypt/letsencrypt.log"
+    success_msg: "[Info] Certbot dry-run successful!"
+  run_once: true
+
+# get certs
+- name: install live certificate
+  shell: certbot --config {{ config_file }}
+  environment:
+    REQUESTS_CA_BUNDLE: '{{ ca_bundle | default(omit) }}'
+
+
+
+
+
+
+
+
+
+# - name: install apache certbot plugin
+#   include_tasks:
+#     file: apache-certbot.yml
+#   when: webserver_stack == 'lamp'
+
+# - name: install nginx certbot plugin
+#   include_tasks:
+#     file: nginx-certbot.yml
+#   when: webserver_stack == 'lemp'
+
+# - name: install certbot standalone plugin
+#   include_tasks:
+#     file: standalone-certbot.yml
+#   when: webserver_stack == 'standalone'
+
+# - name: install certbot standalone plugin
+#   include_tasks:
+#     file: standalone-certbot.yml

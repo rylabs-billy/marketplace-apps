@@ -17,9 +17,9 @@ certbot:pebble () {
   sed -ie 's/"tlsPort"\: .*/"tlsPort"\: 443,/g' test/config/pebble-config.json
   cat test/config/pebble-config.json
 
-  pebble_ca=$(realpath test/certs/pebble.minica.pem)
-  export pebble_ca="${pebble_ca}"
-  github:env "pebble_ca" "${pebble_ca}"
+  ca_bundle=$(realpath test/certs/pebble.minica.pem)
+  export ca_bundle="${ca_bundle}"
+  github:env "ca_bundle" "${ca_bundle}"
 
   # run pebble as a background process
   pebble -config test/config/pebble-config.json > /dev/null 2>&1 &
@@ -28,38 +28,68 @@ certbot:pebble () {
 
 certbot:test () {
   echo "[info] testing mock certbot"
-  local ca_bundle="${1}"
-  local test_ip=127.0.0.201
-  local server="https://localhost:14000/dir"
+  var_chk "ca_bundle" "config_file"
+  # local ca_bundle="${1}"
+  # local test_ip=127.0.0.201
 
-  echo "${test_ip} ${DOMAIN} ${SUBDOMAIN}.${DOMAIN}" | tee -a /etc/hosts
-  apt install python3-certbot -y
-  REQUESTS_CA_BUNDLE="${ca_bundle}" $(which certbot) -n --standalone --agree-tos \
-    --redirect certonly -d "${DOMAIN}" -d "${SUBDOMAIN}.${DOMAIN}" -m "${SOA_EMAIL_ADDRESS}" \
-    --server "${server}" --debug-challenges --verbose --dry-run
+  # apt install python3-certbot -y
+  # echo "${test_ip} ${DOMAIN} ${SUBDOMAIN}.${DOMAIN}" | tee -a /etc/hosts
+
+  REQUESTS_CA_BUNDLE="${ca_bundle}" certbot --config "${config_file}" \
+    --debug-challenges --verbose --dry-run
+
+  # REQUESTS_CA_BUNDLE="${ca_bundle}" $(which certbot) -n --standalone --agree-tos \
+  #   --redirect certonly -d "${DOMAIN}" -d "${SUBDOMAIN}.${DOMAIN}" -m "${SOA_EMAIL_ADDRESS}" \
+  #   --server "${server}" --debug-challenges --verbose --dry-run
 }
 
-certbot:configure () {
-  echo "[info] configuring mock certbot"
-  var_chk "DOMAIN" "SUBDOMAIN" "SOA_EMAIL_ADDRESS"
+certbot:build () {
+  echo "[info] build mock certbot"
+  local test_ip=127.0.0.201
 
+  var_chk "DOMAIN" "SUBDOMAIN" "SOA_EMAIL_ADDRESS"
+  apt install python3-certbot -y
+  echo "${test_ip} ${DOMAIN} ${SUBDOMAIN}.${DOMAIN}" | tee -a /etc/hosts
+  
   install_go
   certbot:pebble
-
-  var_chk "pebble_ca"
-  certbot:test "${pebble_ca}"
+  certbot:config
+  # var_chk "ca_bundle"
+  # certbot:test #"${ca_bundle}"
 }
 
-certbot() {
-  args="$@"
-  var_chk "pebble_ca"
-  certbot_cmd="REQUESTS_CA_BUNDLE=${pebble_ca} $(which certbot) ${args} "
-  certbot_cmd+="--server https://localhost:14000/dir"
-  eval "${certbot_cmd}"
+certbot:config () {
+  local server="https://localhost:14000/dir"
+  local config_file="/etc/letsencrypt/deploy-cli.ini"
+  local cli_ini=$(printf "%s\n" \
+  "key-type = ecdsa" \
+  "elliptic-curve = secp384r1" \
+  "authenticator = standalone" \
+  "certonly = true" \
+  "domains = ${DOMAIN},${SUBDOMAIN}.${DOMAIN}" \
+  "server = ${server}" \
+  "non-interactive = true" \
+  "email = ${SOA_EMAIL_ADDRESS}" \
+  "agree-tos = true" \
+  "redirect = true" \
+  "max-log-backups = 0")
+
+  export config_file="${config_file}"
+  github:env "config_file" "${config_file}"
+  echo "${cli_ini}" | sed 's/- /  - /g' > "${config_file}"
 }
+
+
+# certbot() {
+#   args="$@"
+#   var_chk "pebble_ca"
+#   certbot_cmd="REQUESTS_CA_BUNDLE=${pebble_ca} $(which certbot) ${args} "
+#   certbot_cmd+="--server https://localhost:14000/dir"
+#   eval "${certbot_cmd}"
+# }
 
 # main
-certbot:configure
-bashrc certbot 
+certbot:build
+certbot:test
 
 

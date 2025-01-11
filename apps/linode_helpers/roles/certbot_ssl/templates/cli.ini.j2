@@ -1,0 +1,46 @@
+# Certbot configuration file
+# See examples: https://eff-certbot.readthedocs.io/en/stable/using.html#config-file
+
+# private key
+key-type = ecdsa
+elliptic-curve = secp384r1
+
+# authenticator/configurator (plugin)
+{% if certbot_plugin == 'nginx' or certbot_plugin == 'apache' %}
+configurator = {{ certbot_plugin }}
+{% else %}
+authenticator = {{ certbot_plugin }}
+{% endif %}
+{% if certbot_plugin == 'standalone' %}
+certonly = true
+{% elif certbot_plugin == "webroot" %}
+webroot-path = {{ webroot }}
+{% endif %}
+
+# domains
+{% if domain and subdomain != 'www' %}
+domain = {{ subdomain }}.{{ domain }}
+{% elif domain and subdomain == 'www' %}
+domains = {{ domain }},{{ subdomain }}.{{ domain }}
+{% else %}
+domain = {{ default_dns }}
+{% endif %}
+
+# server address for testing
+{% if "succeeded" in test_server.stdout %}
+server = http://localhost:14000/dir
+{% endif %}
+
+# other options 
+non-interactive = true
+email = {{ soa_email_address }}
+agree-tos = true
+redirect = true
+max-log-backups = 0
+
+# plugin post hooks
+{% if certbot_plugin == 'nginx' %}
+post-hook = systemctl reload nginx
+{% elif certbot_plugin == 'apache' %}
+post-hook = systemctl reload apache2
+{% endif %}
