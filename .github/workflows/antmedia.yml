@@ -30,7 +30,7 @@ jobs:
     uses: ./.github/workflows/test.yml
     with:
       app-name: ${{ matrix.version }}
-      platform: ${{ matrix.os }}
+      platform: ubuntu-22.04 #${{ matrix.os }}
       certbot: true
     # steps:
     #   - name: Checkout
