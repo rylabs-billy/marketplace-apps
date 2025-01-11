@@ -66,10 +66,10 @@ jobs:
         run: |-
           # echo "TRYING WITH SUDO"
           # sudo -E ./lib/certbot.sh
-          tail ~/.bashrc && sudo tail ~/.bashrc
-          sudo -E ./lib/test.sh
-          echo "TRYING WITHOUT SUDO"
-          ./lib/test.sh
+          # tail ~/.bashrc && sudo tail ~/.bashrc
+          # sudo -E ./lib/test.sh
+          # echo "TRYING WITHOUT SUDO"
+          # ./lib/test.sh
           sudo -E ./deployment_scripts/linode-marketplace-$APP/$APP-deploy.sh
         env:
           APP: ${{ inputs.app-name }}
