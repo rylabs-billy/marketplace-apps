@@ -12,11 +12,24 @@
 #       - name: apache
 #         stack: lamp
 
+- name: test logic
+  set_fact:
+    myvar: >-
+      {% if webserver_stack %}
+      true
+      {% else %}
+      false
+      {% endif %}
+
+- name: prin var
+  debug:
+    var: myvar
+
 - name: set certbot facts
   set_fact:
     certbot_plugin: "{{ item.name if webserver_stack == item.stack | default('standalone') }}"
     certbot_package: "{{ item.package if webserver_stack == item.stack | default('python3-certbot') }}"
-    certonly: "{% true if not (webserver_stack) else false %}"
+    certonly: "{{ true if not (webserver_stack) else false | default(true) }}"
     # certbot_plugin: {{ standalone }}
     config_file: /etc/letsencrypt/deploy-cli.ini
     cacheable: yes
