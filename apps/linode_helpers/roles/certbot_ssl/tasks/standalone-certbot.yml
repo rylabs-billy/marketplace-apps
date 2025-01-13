@@ -8,13 +8,23 @@
 - name: set certbot plugin
   set_fact:
     certbot_plugin: standalone
-    prefix: "{{ ca_bundles | ternary('REQUESTS_CA_BUNDLE={{ca_bundle}}', omit) }}"
+    prefix: 'REQUESTS_CA_BUNDLE={{ ca_bundle }}'
+    cmd: certbot certonly --config {{ config_file }} --dry-run -vvv
+    prefix: REQUESTS_CA_BUNDLE={{ ca_bundle | default(omit) }}
     # prefix: '{% if ca_bundle %}REQUESTS_CA_BUNDLE="{{ ca_bundle }}"{% endif %} '
     cacheable: yes
 
 - name: print prefix
   debug:
     var: prefix
+
+- name: certbot command
+  set_fact:
+    certbot_cmd: '{{ prefix }} {{ cmd }}'
+
+- name: print certbot command
+  debug:
+    var: certbot_cmd
 
 - name: write certbot config file
   template:
@@ -36,7 +46,8 @@
     echo "-----"
     cat {{ config_file }}
     echo "now trying certbot"
-    certbot certonly --config {{ config_file }} --dry-run -vvv
+    {{ certbot_cmd }}
+    # certbot certonly --config {{ config_file }} --dry-run -vvv
   register: dry_run
   until: dry_run is not failed
   retries: 3
