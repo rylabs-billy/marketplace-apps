@@ -74,7 +74,7 @@ jobs:
         env:
           APP: ${{ inputs.app-name }}
           TOKEN_PASSWORD: ${{ secrets.LINODE_TOKEN }}
-          # CA_BUNDLE: ${{ env.pebble_ca_path }}
+          CA_BUNDLE: ${{ env.CA_BUNDLE }}
 
       - name: Validate playbook success
         shell: bash

@@ -17,9 +17,8 @@ certbot:pebble () {
   sed -ie 's/"tlsPort"\: .*/"tlsPort"\: 443,/g' test/config/pebble-config.json
   cat test/config/pebble-config.json
 
-  ca_bundle=$(realpath test/certs/pebble.minica.pem)
-  export ca_bundle="${ca_bundle}"
-  github:env "ca_bundle" "${ca_bundle}"
+  export CA_BUNDLE=$(realpath test/certs/pebble.minica.pem)
+  github:env "CA_BUNDLE" "${CA_BUNDLE}"
 
   # run pebble as a background process
   pebble -config test/config/pebble-config.json > /dev/null 2>&1 &
@@ -28,14 +27,14 @@ certbot:pebble () {
 
 certbot:test () {
   echo "[info] testing mock certbot"
-  var_chk "ca_bundle" "config_file"
+  var_chk "CA_BUNDLE" "CONFIG_FILE"
   # local ca_bundle="${1}"
   # local test_ip=127.0.0.201
 
   # apt install python3-certbot -y
   # echo "${test_ip} ${DOMAIN} ${SUBDOMAIN}.${DOMAIN}" | tee -a /etc/hosts
 
-  REQUESTS_CA_BUNDLE="${ca_bundle}" certbot certonly --config "${config_file}" \
+  REQUESTS_CA_BUNDLE="${CA_BUNDLE}" certbot certonly --config "${CONFIG_FILE}" \
     --debug-challenges --verbose --dry-run
 
   # REQUESTS_CA_BUNDLE="${ca_bundle}" $(which certbot) -n --standalone --agree-tos \
@@ -72,9 +71,9 @@ certbot:config () {
   "redirect = True" \
   "max-log-backups = 0")
 
-  export config_file="/etc/letsencrypt/deploy-cli.ini"
-  github:env "config_file" "${config_file}"
-  echo "${cli_ini}" | sed 's/- /  - /g' > "${config_file}"
+  export CONFIG_FILE="/etc/letsencrypt/deploy-cli.ini"
+  github:env "config_file" "${CONFIG_FILE}"
+  echo "${cli_ini}" | sed 's/- /  - /g' > "${CONFIG_FILE}"
 }
 
 

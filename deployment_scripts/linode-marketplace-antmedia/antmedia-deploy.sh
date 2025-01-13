@@ -71,7 +71,10 @@ EOF
     echo "token_password: ${TOKEN_PASSWORD}" >> ${group_vars};
   else echo "No API token entered";
   fi
-  
+
+  if [[ -n ${CA_BUNDLE} ]]; then
+    echo "ca_bundle: ${CA_BUNDLE}" >> ${group_vars};
+  fi 
 }
 
 function run {
@@ -80,9 +83,13 @@ function run {
   apt-get install -y git python3 python3-pip
 
   # clone repo and set up ansible environment
-  git -C /tmp clone ${GIT_REPO}
-  # for a single testing branch
-  # git -C /tmp clone -b ${BRANCH} ${GIT_REPO}
+  # testing: set $BRANCH environment variable
+  echo "[info] cloning git repo"
+  if [ -z "${BRANCH}" ]; then 
+    git -C /tmp clone ${GIT_REPO} ${WORK_DIR}
+  else
+    git -C /tmp clone -b ${BRANCH} ${GIT_REPO} ${WORK_DIR}
+  fi
 
   # venv
   cd ${WORK_DIR}/${MARKETPLACE_APP}

@@ -72,6 +72,9 @@ EOF
   else echo "No API token entered";
   fi
   
+  if [[ -n ${CA_BUNDLE} ]]; then
+    echo "ca_bundle: ${CA_BUNDLE}" >> ${group_vars};
+  fi 
 }
 
 function run {
