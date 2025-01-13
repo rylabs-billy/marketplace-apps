@@ -20,7 +20,8 @@
 
 # certbot dry-runs
 - name: run dry-run for subdomain
-  shell: certbot certonly --config {{ config_file }} --dry-run
+  shell:
+    cmd: certbot certonly --config {{ config_file }} --dry-run
   register: dry_run
   until: dry_run is not failed
   retries: 3
