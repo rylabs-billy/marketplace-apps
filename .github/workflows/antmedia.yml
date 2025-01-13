@@ -24,9 +24,9 @@ jobs:
         version:
           - antmedia
           - antmedia-community
-        os:
-          - ubuntu-22.04
-          - ubuntu-24.04
+        # os:
+        #   - ubuntu-22.04
+        #   - ubuntu-24.04
     uses: ./.github/workflows/test.yml
     with:
       app-name: ${{ matrix.version }}

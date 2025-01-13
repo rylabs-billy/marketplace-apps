@@ -11,9 +11,7 @@ configurator = {{ certbot_plugin }}
 {% else %}
 authenticator = {{ certbot_plugin }}
 {% endif %}
-{% if certbot_plugin == 'standalone' %}
-certonly = true
-{% elif certbot_plugin == "webroot" %}
+{% if certbot_plugin == "webroot" %}
 webroot-path = {{ webroot }}
 {% endif %}
 
