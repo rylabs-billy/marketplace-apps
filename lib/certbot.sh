@@ -72,7 +72,7 @@ certbot:config () {
   "max-log-backups = 0")
 
   export CONFIG_FILE="/etc/letsencrypt/deploy-cli.ini"
-  github:env "config_file" "${CONFIG_FILE}"
+  github:env "CONFIG_FILE" "${CONFIG_FILE}"
   echo "${cli_ini}" | sed 's/- /  - /g' > "${CONFIG_FILE}"
 }
 
