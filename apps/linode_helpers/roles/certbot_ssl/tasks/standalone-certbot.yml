@@ -8,13 +8,13 @@
 - name: set certbot plugin
   set_fact:
     certbot_plugin: standalone
-    # prefix: "{{ ca_bundle | ternary('REQUESTS_CA_BUNDLE=(ca_bundle)', omit) }}"
+    prefix: "{{ ca_bundle | ternary('REQUESTS_CA_BUNDLE=(ca_bundle)', omit) }}"
     # prefix: '{% if ca_bundle %}REQUESTS_CA_BUNDLE="{{ ca_bundle }}"{% endif %} '
     cacheable: yes
 
-# - name: print prefix
-#   debug:
-#     var: '{{ prefix }}'
+- name: print prefix
+  debug:
+    var: '{{ prefix }}'
 
 - name: write certbot config file
   template:
