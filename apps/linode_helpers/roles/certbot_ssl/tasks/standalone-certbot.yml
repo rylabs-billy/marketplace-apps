@@ -8,6 +8,8 @@
 - name: set certbot plugin
   set_fact:
     certbot_plugin: standalone
+    # prefix: {{ enabled | ternary('no shutdown', 'shutdown', omit) }}
+    # prefix: '{% if ca_bundle %}REQUESTS_CA_BUNDLE="{{ ca_bundle }}"{% endif %} '
     cacheable: yes
 
 - name: write certbot config file
@@ -18,10 +20,19 @@
     group: root
     mode: '0644'
 
+- name: build certbot command
+  set_fact:
+    
 # certbot dry-runs
 - name: run dry-run for subdomain
-  shell:
-    cmd: certbot certonly --config {{ config_file }} --dry-run -vvv
+  shell: |-
+    echo TEST
+    echo "REQUESTS_CA_BUNDLE is: ${REQUESTS_CA_BUNDLE}"
+    echo "config file is:"
+    echo "-----"
+    cat {{ config_file }}
+    echo "now trying certbot"
+    certbot certonly --config {{ config_file }} --dry-run -vvv
   register: dry_run
   until: dry_run is not failed
   retries: 3
