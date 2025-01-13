@@ -8,9 +8,9 @@
 - name: set certbot plugin
   set_fact:
     certbot_plugin: standalone
-    prefix: 'REQUESTS_CA_BUNDLE={{ ca_bundle }}'
-    cmd: certbot certonly --config {{ config_file }} --dry-run -vvv
     prefix: REQUESTS_CA_BUNDLE={{ ca_bundle | default(omit) }}
+    naw: REQUESTS_CA_BUNDLE={{ ca_bundles | default(omit) }}
+    cmd: certbot certonly --config {{ config_file }} --dry-run -vvv
     # prefix: '{% if ca_bundle %}REQUESTS_CA_BUNDLE="{{ ca_bundle }}"{% endif %} '
     cacheable: yes
 
