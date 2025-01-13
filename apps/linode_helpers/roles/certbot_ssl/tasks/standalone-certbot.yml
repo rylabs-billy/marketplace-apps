@@ -18,6 +18,10 @@
   debug:
     var: prefix
 
+- name: print naw
+  debug:
+    var: naw
+
 - name: certbot command
   set_fact:
     certbot_cmd: '{{ prefix }} {{ cmd }}'
@@ -47,7 +51,6 @@
     cat {{ config_file }}
     echo "now trying certbot"
     {{ certbot_cmd }}
-    # certbot certonly --config {{ config_file }} --dry-run -vvv
   register: dry_run
   until: dry_run is not failed
   retries: 3
