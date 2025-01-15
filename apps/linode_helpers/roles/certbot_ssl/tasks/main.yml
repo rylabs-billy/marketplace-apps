@@ -1,6 +1,17 @@
 ---
 # apps/linode_helpers/roles/certbot_ssl/tasks/main.yml
 # import some DNS propagation task before getting cert
+
+- name: check for acme test server
+  shell: nc -nvz 127.0.0.1 14000 2>&1 || /bin/true
+  register: test_server
+  tags: test
+
+- name: set certbot config path
+  set_fact:
+    config_file: /etc/letsencrypt/deploy-cli.ini
+    cacheable: yes
+
 - name: install apache certbot plugin
   include_tasks:
     file: apache-certbot.yml
@@ -15,3 +26,7 @@
   include_tasks:
     file: standalone-certbot.yml
   when: webserver_stack == 'standalone'
+
+- name: install certbot standalone plugin
+  include_tasks:
+    file: standalone-certbot.yml

@@ -1,0 +1,42 @@
+# Certbot configuration file
+# See examples: https://eff-certbot.readthedocs.io/en/stable/using.html#config-file
+
+# private key
+key-type = ecdsa
+elliptic-curve = secp384r1
+
+# rsa key
+rsa-key-size = 4096
+
+# email
+email = test@example.com
+
+# authenticator/configurator (plugin)
+authenticator = {{ certbot_plugin }}
+{% if certbot_plugin == 'nginx' or certbot_plugin == 'apache' %}
+installer = {{ certbot_plugin }}
+{% endif %}
+{% if certbot_plugin == "webroot" %}
+webroot-path = {{ webroot }}
+{% endif %}
+
+# automatically agree to the terms of service of the acme server
+agree-tos = true
+
+# alternate acme server for testing
+{% if "succeeded" in test_server.stdout %}
+server = https://localhost:14000/dir
+{% endif %}
+
+# domains
+{% if domain and subdomain != 'www' %}
+domain = {{ subdomain }}.{{ domain }}
+{% elif domain and subdomain == 'www' %}
+domains = {{ domain }},{{ subdomain }}.{{ domain }}
+{% else %}
+domain = {{ default_dns }}
+{% endif %}
+
+# other options
+redirect = true
+non-interactive = true
