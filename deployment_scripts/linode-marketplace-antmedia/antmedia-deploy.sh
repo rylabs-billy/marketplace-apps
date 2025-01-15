@@ -15,7 +15,7 @@ trap "cleanup $? $LINENO" EXIT
 #<UDF name="soa_email_address" label="Email address (for the Ant Media Server Login & SSL Generation)">
 
 # git repo
-export GIT_REPO="https://github.com/akamai-compute-marketplace/marketplace-apps.git"
+[ -z "${GIT_REPO}" ] && export GIT_REPO="https://github.com/akamai-compute-marketplace/marketplace-apps.git"
 export WORK_DIR="/tmp/marketplace-apps" 
 export MARKETPLACE_APP="apps/linode-marketplace-antmedia"
 
@@ -23,8 +23,16 @@ export MARKETPLACE_APP="apps/linode-marketplace-antmedia"
 exec > >(tee /dev/ttyS0 /var/log/stackscript.log) 2>&1
 
 function cleanup {
-  if [ -d "${WORK_DIR}" ]; then
-    rm -rf ${WORK_DIR}
+  if [ "$?" != "0" ]; then
+    echo "PLAYBOOK FAILED. See /var/log/stackscript.log for details."
+    if [ -n "$GITHUB_ENV" ]; then
+      echo "PLAYBOOK_FAILED=1" | tee -a $GITHUB_ENV
+    fi
+
+    if [ -d "${WORK_DIR}" ]; then
+      rm -rf ${WORK_DIR}
+    fi
+    exit 1
   fi
 }
 
@@ -63,7 +71,10 @@ EOF
     echo "token_password: ${TOKEN_PASSWORD}" >> ${group_vars};
   else echo "No API token entered";
   fi
-  
+
+  if [[ -n ${CA_BUNDLE} ]]; then
+    echo "ca_bundle: ${CA_BUNDLE}" >> ${group_vars};
+  fi 
 }
 
 function run {
@@ -72,9 +83,13 @@ function run {
   apt-get install -y git python3 python3-pip
 
   # clone repo and set up ansible environment
-  git -C /tmp clone ${GIT_REPO}
-  # for a single testing branch
-  # git -C /tmp clone -b ${BRANCH} ${GIT_REPO}
+  # testing: set $BRANCH environment variable
+  echo "[info] cloning git repo"
+  if [ -z "${BRANCH}" ]; then 
+    git -C /tmp clone ${GIT_REPO} ${WORK_DIR}
+  else
+    git -C /tmp clone -b ${BRANCH} ${GIT_REPO} ${WORK_DIR}
+  fi
 
   # venv
   cd ${WORK_DIR}/${MARKETPLACE_APP}
@@ -92,9 +107,6 @@ function run {
   
 }
 
-function installation_complete {
-  echo "Installation Complete"
-}
 # main
-run && installation_complete
+run && echo "Installation Complete"
 cleanup
