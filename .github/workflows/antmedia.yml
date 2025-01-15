@@ -1,0 +1,46 @@
+name: antmedia-test
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - antmedia-ci
+    paths:
+      - 'apps/linode-marketplace-antmedia/**'
+      - 'deployment_scripts/linode-marketplace-antmedia/**'
+      - '!apps/linode-marketplace-antmedia/README.md'
+  pull_request:
+      paths:
+        - 'apps/linode-marketplace-antmedia/**'
+        - 'deployment_scripts/linode-marketplace-antmedia/**'
+        - '!apps/linode-marketplace-antmedia/README.md'
+  workflow_dispatch:
+
+jobs:
+  setup:
+    uses: ./.github/workflows/setup.yml
+    secrets: inherit
+
+  build:
+    if: ${{ needs.setup.result == 'success' }}
+    needs: setup
+    uses: ./.github/workflows/test.yml
+    with:
+      app-name: antmedia
+      platform: self-hosted
+      certbot: true
+    secrets: inherit
+
+  teardown:
+    if: always()
+    needs:
+     - setup
+     - build
+    uses: ./.github/workflows/cleanup.yml
+    with:
+      repo: ${{ needs.setup.outputs.repo }}
+      owner: ${{ needs.setup.outputs.owner }}
+      tag: ${{ needs.setup.outputs.tag }}
+      domain: ${{ needs.build.outputs.test-domain }}
+    secrets: inherit

@@ -1,0 +1,67 @@
+name: cleanup
+
+on:
+  workflow_call:
+    inputs:
+      domain:
+        description: 'Linode hosted domain'
+        required: false
+        type: string
+      subdomain:
+        description: 'Linode hosted subdomain'
+        required: false
+        type: string
+      tag:
+        description: 'Linode instance tag'
+        required: true
+        type: string
+      repo:
+        description: 'Github repo'
+        required: true
+        type: string
+      owner:
+        description: 'Github user'
+        required: true
+        type: string
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remove self-hosted runner
+        shell: bash
+        run: |-
+            gh api \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/$OWNER/$REPO/actions/runners
+        env:
+          REPO: ${{ inputs.repo }}
+          OWNER: ${{ inputs.owner }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+              
+      - name: Install the linode cli
+        uses: linode/action-linode-cli@v1
+        with:
+          token: ${{ secrets.LINODE_TOKEN }}
+
+      - name: Remove linodes
+        shell: bash
+        run: |-
+          LINODE_IDS=($(linode-cli linodes list --tags $TAG --json | jq -r .[].id))
+          for linode in ${LINODE_IDS[@]}; do
+          linode-cli linodes delete $linode
+          done
+        env:
+          TAG: ${{ inputs.tag }}
+    
+      - name: Remove dns records
+        shell: bash
+        run: |-
+          if [ -n "$DOMAIN" ]; then
+            DOMAIN_ID=$(linode-cli domains list --domain $DOMAIN --json | jq -r .[].id)
+            linode-cli domains delete $DOMAIN_ID
+          fi
+        env:
+          DOMAIN: ${{ inputs.domain }}
+          # SUBDOMAIN: ${{ inputs.subdomain }}

@@ -1,0 +1,66 @@
+name: setup
+
+on:
+  workflow_call:
+    outputs:
+      user-data:
+        description: 'Cloud-init user-data for configuring runner'
+        value: ${{ jobs.setup.outputs.user-data }}
+      runner-name:
+        description: 'Name of self-hosted runner'
+        value: ${{ jobs.setup.outputs.runner-name }}
+      linode-id:
+        description: 'Linode instance ID'
+        value: ${{ jobs.setup.outputs.linode-id }}
+      label:
+        description: 'Linode instance label'
+        value: ${{ jobs.setup.outputs.label }}
+      tag:
+        description: 'Linode instance tag'
+        value: ${{ jobs.setup.outputs.tag }}
+      owner:
+        description: 'Repository owner'
+        value: ${{ jobs.setup.outputs.owner }}
+      repo:
+        description: 'Repository name'
+        value: ${{ jobs.setup.outputs.repo }}
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      user-data: ${{ steps.user-data.outputs.user-data }}
+      runner-name: ${{ steps.user-data.outputs.runner-name }}
+      linode-id: ${{ steps.linode-instance.outputs.linode-id }}
+      label: ${{ steps.vars.outputs.label }}
+      tag: ${{ steps.vars.outputs.tag }}
+      owner: ${{ steps.vars.outputs.owner }}
+      repo: ${{ steps.vars.outputs.repo }}
+    steps:
+      - id: vars
+        shell: bash
+        run: |-
+          IFS='/' read -r OWNER REPO <<< "$GITHUB_REPOSITORY"
+          read -d - UUID <<< $(uuidgen)
+          echo "owner=${OWNER}" >> $GITHUB_OUTPUT
+          echo "repo=${REPO}" >> $GITHUB_OUTPUT
+          echo "label=${REPO}-${UUID}" >> $GITHUB_OUTPUT
+          echo "tag=${REPO}-${UUID}-test" >> $GITHUB_OUTPUT
+
+      - id: user-data
+        uses: rylabs-billy/action-runner-userdata@v1.0.0
+        with:
+          scope: repository
+          repo: ${{ steps.vars.outputs.repo }}
+          owner: ${{ steps.vars.outputs.owner }}
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - id: linode-instance
+        uses: rylabs-billy/action-linode-instance@v1.0.0
+        with:
+          token: ${{ secrets.LINODE_TOKEN }}
+          label: ${{ steps.vars.outputs.label }}
+          # ssh-key: ${{ secrets.SSH_KEY }}
+          user-data: ${{ steps.user-data.outputs.user-data }}
+          tag: ${{ steps.vars.outputs.tag }}

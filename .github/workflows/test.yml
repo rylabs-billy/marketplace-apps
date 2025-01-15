@@ -1,0 +1,77 @@
+name: test
+
+on:
+  workflow_call:
+    inputs:
+      app-name:
+        description: 'Marketplace app name'
+        required: true
+        type: string
+      platform:
+        description: 'OS image'
+        required: false
+        default: ubuntu-latest
+        type: string
+      certbot:
+        description: 'Use certbot helper'
+        required: false
+        type: boolean
+    outputs:
+      test-domain:
+        description: 'Randomized test domain'
+        value: ${{ jobs.test.outputs.test-domain }}
+
+jobs:
+  test:
+    runs-on: ${{ inputs.platform }}
+    outputs:
+      test-domain: ${{ steps.test-udfs.outputs.test-domain }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set git repo and branch environment variables
+        shell: bash
+        run: |-
+          echo "[info] git repo: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY"
+          echo "GIT_REPO=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" >> $GITHUB_ENV
+
+          if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
+            BRANCH="$GITHUB_BASE_REF"
+          elif [ "$GITHUB_REF_NAME" != "main" ]; then
+            BRANCH="$GITHUB_REF_NAME"
+          fi
+
+          echo "[info] git branch: $BRANCH"
+          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+
+      - name: Set test UDFs
+        id: test-udfs
+        shell: bash
+        run: ./deployment_scripts/linode-marketplace-$APP/test-vars.sh
+        env:
+          APP: ${{ inputs.app-name }}
+          TOKEN_PASSWORD: ${{ secrets.LINODE_TOKEN }}
+
+      - name: Mock certbot
+        if: ${{ inputs.certbot == true }}
+        run: ./lib/certbot.sh
+
+      - name: Deploy playbook
+        shell: bash
+        run: ./deployment_scripts/linode-marketplace-$APP/$APP-deploy.sh
+        env:
+          APP: ${{ inputs.app-name }}
+          TOKEN_PASSWORD: ${{ secrets.LINODE_TOKEN }}
+          CA_BUNDLE: ${{ env.CA_BUNDLE }}
+
+      - name: Validate playbook success
+        shell: bash
+        run: |-
+          if [ -n "$PLAYBOOK_FAIL" ]; then
+            OUTPUT=$(cat /var/log/stackscript.log | grep -i failed | tail)
+            echo -e "::error title=playbook failed::$OUTPUT\n"
+            exit 1
+          fi
