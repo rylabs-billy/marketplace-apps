@@ -20,6 +20,7 @@
 
 - name: run Ant Media Server installation script
   script: "/tmp/install_ant-media-server.sh -i {{ ant_media_zip_local_path }}"
+  no_log: true
 
 # Bypass user setup
 - name: wait for service to be available
