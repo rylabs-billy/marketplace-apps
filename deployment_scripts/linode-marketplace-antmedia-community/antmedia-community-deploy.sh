@@ -2,6 +2,12 @@
 set -e
 trap "cleanup $? $LINENO" EXIT
 
+DEBUG="NO"
+if [ "${DEBUG}" == "YES" ]; then
+  echo "DEBUG=${DEBUG}"
+  source ./test-vars.sh
+fi
+
 ## Linode/SSH security settings
 #<UDF name="user_name" label="The limited sudo user to be created for the Linode: *No Capital Letters or Special Characters*">
 #<UDF name="disable_root" label="Disable root access over SSH?" oneOf="Yes,No" default="No">
@@ -29,8 +35,10 @@ function cleanup {
       echo "PLAYBOOK_FAILED=1" | tee -a $GITHUB_ENV
     fi
 
-    if [ -d "${WORK_DIR}" ]; then
-      rm -rf ${WORK_DIR}
+    if [ "${DEBUG}" == "NO" ]; then
+      if [ -d "${WORK_DIR}" ]; then
+        rm -rf ${WORK_DIR}
+      fi
     fi
     exit 1
   fi
