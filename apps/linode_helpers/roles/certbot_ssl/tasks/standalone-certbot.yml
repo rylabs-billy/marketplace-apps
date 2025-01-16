@@ -5,10 +5,10 @@
     name: python3-certbot
     state: present
 
-- name: set certbot plugin
+- name: set certbot params
   set_fact:
     certbot_plugin: standalone
-    prefix: REQUESTS_CA_BUNDLE={{ ca_bundle | default(omit) }}
+    prefix: REQUESTS_CA_BUNDLE={{ ca_bundle | default(None) }}
     cmd: certbot certonly --config {{ config_file }}
     cacheable: yes
 
