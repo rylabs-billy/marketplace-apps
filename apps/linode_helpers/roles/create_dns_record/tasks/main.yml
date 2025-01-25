@@ -56,7 +56,8 @@
     state: present
   when:
     - domain is defined
-    - subdomain == "www"
+    - domain_output.zone_file.zone_file.0 is not defined
+    # - subdomain == "www"
 
 - name: create A record for subdomain
   linode.cloud.domain_record:
