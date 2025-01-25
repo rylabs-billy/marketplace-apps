@@ -5,26 +5,38 @@
     name: python3-certbot-nginx
     state: present
 
-- name: set certbot plugin
+# - name: set certbot plugin
+#   set_fact:
+#     certbot_plugin: nginx
+#     cacheable: yes
+
+- name: set certbot params
   set_fact:
     certbot_plugin: nginx
+    prefix: REQUESTS_CA_BUNDLE={{ ca_bundle | default(None) }}
+    cmd: certbot --config {{ config_file }}
     cacheable: yes
 
-- name: installing let's encrypt certificate on subdomain provided via UDF
-  shell:
-    cmd: "certbot -n --nginx --agree-tos --redirect -d {{ subdomain }}.{{ domain }} -m {{ soa_email_address }}"
-  when: 
-    - domain is defined
-    - subdomain != 'www'
+# - name: certbot command
+#   set_fact:
+#     certbot_cmd: '{{ prefix }} {{ cmd }}'
+#     cacheable: yes
 
-- name: installing let's encrypt certificate on tld and default subdomain provided via UDF
-  shell: 
-    cmd: "certbot -n --nginx --agree-tos --redirect -d {{ domain }} -d {{ subdomain }}.{{ domain }} -m {{ soa_email_address }}"
-  when:
-    - domain is defined
-    - subdomain == 'www'
+# - name: installing let's encrypt certificate on subdomain provided via UDF
+#   shell:
+#     cmd: "certbot -n --nginx --agree-tos --redirect -d {{ subdomain }}.{{ domain }} -m {{ soa_email_address }}"
+#   when: 
+#     - domain is defined
+#     - subdomain != 'www'
 
-- name: installing let's encrypt certificate on default domain
-  shell:
-    cmd: "certbot -n --nginx --agree-tos --redirect -d {{ default_dns }} -m {{ soa_email_address }}"
-  when: default_dns is defined
+# - name: installing let's encrypt certificate on tld and default subdomain provided via UDF
+#   shell: 
+#     cmd: "certbot -n --nginx --agree-tos --redirect -d {{ domain }} -d {{ subdomain }}.{{ domain }} -m {{ soa_email_address }}"
+#   when:
+#     - domain is defined
+#     - subdomain == 'www'
+
+# - name: installing let's encrypt certificate on default domain
+#   shell:
+#     cmd: "certbot -n --nginx --agree-tos --redirect -d {{ default_dns }} -m {{ soa_email_address }}"
+#   when: default_dns is defined
