@@ -17,10 +17,21 @@
     cmd: certbot --config {{ config_file }}
     cacheable: yes
 
-# - name: certbot command
-#   set_fact:
-#     certbot_cmd: '{{ prefix }} {{ cmd }}'
-#     cacheable: yes
+- name: certbot command
+  set_fact:
+    certbot_cmd: '{{ prefix }} {{ cmd }}'
+
+- name: write certbot config file
+  template:
+    src: templates/cli.ini.j2
+    dest: '{{ config_file }}'
+    owner: root
+    group: root
+    mode: '0644'
+
+# get certs
+- name: install live certificate
+  shell: '{{ certbot_cmd }}'
 
 # - name: installing let's encrypt certificate on subdomain provided via UDF
 #   shell:

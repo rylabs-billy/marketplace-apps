@@ -31,35 +31,3 @@
 #   include_tasks:
 #     file: standalone-certbot.yml
 
-- name: certbot command
-  set_fact:
-    certbot_cmd: '{{ prefix }} {{ cmd }}'
-
-- name: write certbot config file
-  template:
-    src: templates/cli.ini.j2
-    dest: '{{ config_file }}'
-    owner: root
-    group: root
-    mode: '0644'
-
-# certbot dry-runs
-- name: run dry-run for domains
-  shell: '{{ certbot_cmd }} --dry-run'
-  register: dry_run
-  until: dry_run is not failed
-  retries: 3
-  delay: 3
-  ignore_errors: true
-
-# assert that we can get valid certs. Otherwise fail - can't achieve final state
-- name: validate certbot dry-run
-  assert:
-    that: dry_run is not failed
-    fail_msg: "[Error] Certbot dry-run domain. Please check /var/log/letsencrypt/letsencrypt.log"
-    success_msg: "[Info] Certbot dry-run successful!"
-  run_once: true
-
-# get certs
-- name: install live certificate
-  shell: '{{ certbot_cmd }}'
